@@ -99,10 +99,8 @@
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
             const provider = new GoogleAuthProvider();
-
             setupAuthentication(auth, provider);
             setupDownloader();
-
         } catch (error) {
             console.error("FIREBASE INITIALIZATION FAILED:", error);
         }
@@ -140,7 +138,6 @@
                 const email = emailInput.value;
                 const password = passwordInput.value;
                 showAuthError('');
-
                 try {
                     await signInWithEmailAndPassword(auth, email, password);
                 } catch (error) {
@@ -196,23 +193,23 @@
                 for (const instance of INVIDIOUS_INSTANCES) {
                     try {
                         const response = await fetch(`${instance}/api/v1/videos/${videoId}`);
-                        if (!response.ok) throw new Error('API request failed');
+                        if (!response.ok) throw new Error(`API request failed with status ${response.status}`);
                         const result = await response.json();
                         
-                        // --- THE FIX IS HERE ---
-                        // Check if the result is a valid object with the properties we need
-                        if (result && result.formatStreams && result.adaptiveFormats) {
+                        console.log(`Data from ${instance}:`, result); // Log the data for debugging
+
+                        // --- ROBUST CHECK ---
+                        // This new code checks every property before trying to use it.
+                        if (result && result.videoId) {
                             displayDownloadOptions(result);
                             success = true;
-                            break; // Exit the loop because we found a working server
+                            break;
                         } else {
-                            // The server responded, but didn't give us video data. Try the next server.
                             console.warn(`API at ${instance} returned invalid data.`);
-                            throw new Error('Invalid data structure from API');
+                            throw new Error('Invalid data structure');
                         }
                     } catch (error) { 
                         console.error(`Error with ${instance}:`, error);
-                        // Let the loop continue to the next instance
                     }
                 }
 
@@ -221,15 +218,35 @@
             });
 
             function displayDownloadOptions(data) {
-                // This function is now safe because we check the data before calling it.
-                const { title, formatStreams, adaptiveFormats } = data;
+                // This function is now much safer and will not cause a TypeError.
+                const title = data.title || 'Untitled Video';
+                const formatStreams = Array.isArray(data.formatStreams) ? data.formatStreams : [];
+                const adaptiveFormats = Array.isArray(data.adaptiveFormats) ? data.adaptiveFormats : [];
+
                 let html = `<h3 class="text-2xl font-bold mb-4">${title}</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">`;
-                const videoStreams = formatStreams.filter(f => f.container === 'mp4' && f.resolution).sort((a,b) => parseInt(b.resolution) - parseInt(a.resolution));
-                videoStreams.forEach(f => { html += createLinkHtml({ url: f.url, quality: f.resolution, text: `Download Video` }); });
-                const audioStreams = adaptiveFormats.filter(f => f.type.startsWith("audio/")).sort((a, b) => b.bitrate - a.bitrate);
-                if (audioStreams.length > 0) { html += createLinkHtml({ url: audioStreams[0].url, quality: 'Best Audio', text: `Download Audio` }); }
+                
+                const videoStreams = formatStreams
+                    .filter(f => f && f.container === 'mp4' && f.resolution && f.url)
+                    .sort((a,b) => parseInt(b.resolution) - parseInt(a.resolution));
+                
+                videoStreams.forEach(f => { 
+                    html += createLinkHtml({ url: f.url, quality: f.resolution, text: `Download Video` }); 
+                });
+                
+                const audioStreams = adaptiveFormats
+                    .filter(f => f && f.type && f.type.startsWith("audio/") && f.url)
+                    .sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0));
+
+                if (audioStreams.length > 0) { 
+                    html += createLinkHtml({ url: audioStreams[0].url, quality: 'Best Audio', text: `Download Audio` }); 
+                }
+                
                 html += `</div>`;
                 downloadLinksDiv.innerHTML = html;
+
+                if (videoStreams.length === 0 && audioStreams.length === 0) {
+                    showResultsError('No downloadable formats were found for this video.');
+                }
             }
 
             function createLinkHtml({ url, quality, text }) {
@@ -242,5 +259,4 @@
         }
     </script>
 </body>
-    </html>
-    
+</html>

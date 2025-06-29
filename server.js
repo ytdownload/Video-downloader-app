@@ -3,8 +3,8 @@
 // --- 1. Import Dependencies ---
 const express = require('express');
 const cors = require('cors');
-// Use the most robust ytdl-core fork
-const ytdl = require('@distube/ytdl-core');
+// Use the stable 'play-dl' library
+const play = require('play-dl');
 
 // --- 2. Setup Express App ---
 const app = express();
@@ -18,7 +18,7 @@ app.use(express.json());
 app.get('/', (req, res) => {
     res.json({
         status: 'ok',
-        message: 'Node.js backend for RapidGrab is running.'
+        message: 'Node.js backend with play-dl is running.'
     });
 });
 
@@ -32,40 +32,48 @@ app.post('/api/video-info', async (req, res) => {
 
     try {
         console.log(`Fetching info for: ${videoUrl}`);
-        const info = await ytdl.getInfo(videoUrl);
-        console.log(`Successfully fetched info for: ${info.videoDetails.title}`);
+        // Validate the URL using play-dl
+        if (play.yt_validate(videoUrl) !== 'video') {
+             return res.status(400).json({ success: false, error: 'Invalid or unsupported YouTube URL.' });
+        }
 
-        const videoFormats = ytdl.filterFormats(info.formats, 'videoandaudio')
-            .filter(f => f.container === 'mp4')
+        const videoInfo = await play.video_info(videoUrl);
+        const title = videoInfo.video_details.title;
+        console.log(`Successfully fetched info for: ${title}`);
+
+        // play-dl provides formats differently
+        const videoFormats = videoInfo.format
+            .filter(f => f.mime_type.includes('mp4') && f.audio_channels > 0)
             .map(format => ({
                 itag: format.itag,
-                quality: format.qualityLabel,
-                container: format.container,
+                quality: format.quality_label,
+                container: 'mp4',
             }));
         
-        const audioFormats = ytdl.filterFormats(info.formats, 'audioonly')
-             .sort((a, b) => b.audioBitrate - a.audioBitrate);
+        const audioFormats = videoInfo.format
+            .filter(f => f.mime_type.includes('audio/mp4'))
+            .sort((a, b) => b.bitrate - a.bitrate);
 
         res.json({
             success: true,
-            title: info.videoDetails.title,
+            title: title,
             videoFormats: videoFormats,
             bestAudio: audioFormats.length > 0 ? {
                 itag: audioFormats[0].itag,
-                container: audioFormats[0].container,
+                container: 'mp4',
                 quality: 'Best Audio',
             } : null,
         });
 
     } catch (error) {
-        console.error('--- YTDL ERROR ---');
+        console.error('--- PLAY-DL ERROR ---');
         console.error(error);
-        res.status(500).json({ success: false, error: 'Failed to fetch video info. The video may be private, age-restricted, or YouTube is blocking our server.' });
+        res.status(500).json({ success: false, error: 'Failed to fetch video info. The video may be private, age-restricted, or unavailable.' });
     }
 });
 
 // --- 6. API Endpoint to Handle the Download Stream ---
-app.get('/api/download', (req, res) => {
+app.get('/api/download', async (req, res) => {
     const { videoUrl, itag, title } = req.query;
 
     if (!videoUrl || !itag || !title) {
@@ -73,14 +81,21 @@ app.get('/api/download', (req, res) => {
     }
     
     try {
+        console.log(`Starting download for: ${title} (itag: ${itag})`);
+        // Stream using play-dl
+        const stream = await play.stream(videoUrl, {
+            quality: 2, // fallback quality
+            discordPlayerCompatibility: true,
+            seek: 0,
+            itag: itag
+        });
+
         const sanitizedTitle = title.replace(/[^a-zA-Z0-9\s\-_]/g, '');
         
         res.header('Content-Disposition', `attachment; filename="${sanitizedTitle}.mp4"`);
-        
-        console.log(`Starting download for: ${title} (itag: ${itag})`);
-        ytdl(videoUrl, {
-            filter: format => format.itag == itag,
-        }).pipe(res);
+        res.header('Content-Type', stream.type);
+
+        stream.stream.pipe(res);
 
     } catch (error) {
         console.error('Error during download stream:', error);

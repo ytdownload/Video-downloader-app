@@ -174,42 +174,58 @@
             const resultsErrorDiv = document.getElementById('results-error');
             const downloadLinksDiv = document.getElementById('download-links');
 
-            const INVIDIOUS_INSTANCES = ['https://vid.puffyan.us', 'https://invidious.io.lol', 'https://inv.hnh.is', 'https://invidious.projectsegfau.lt'];
-
-            function getYouTubeVideoId(url) {
-                const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/;
-                return url.match(regex)?.[1] || null;
-            }
+            // Using a more stable primary API with fallbacks
+            const API_INSTANCES = [
+                'https://co.wuk.sh', // Primary API (Cobalt)
+                'https://vid.puffyan.us', // Fallback 1
+                'https://invidious.io.lol' // Fallback 2
+            ];
 
             downloadForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const videoId = getYouTubeVideoId(urlInput.value.trim());
-                if (!videoId) { return showResultsError('Invalid YouTube URL.'); }
+                const videoUrl = urlInput.value.trim();
+                if (!videoUrl) { return showResultsError('Please enter a YouTube URL.'); }
                 
                 resetDownloaderUI();
                 setDownloaderLoading(true);
 
                 let success = false;
-                for (const instance of INVIDIOUS_INSTANCES) {
+                for (const instance of API_INSTANCES) {
                     try {
-                        const response = await fetch(`${instance}/api/v1/videos/${videoId}`);
-                        if (!response.ok) throw new Error(`API request failed with status ${response.status}`);
-                        const result = await response.json();
-                        
-                        console.log(`Data from ${instance}:`, result); // Log the data for debugging
+                        console.log(`Trying API: ${instance}`);
+                        const response = await fetch(`${instance}/api/json`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify({ url: videoUrl, isAudioOnly: false }),
+                        });
 
+                        if (!response.ok) {
+                            throw new Error(`API request failed with status ${response.status}`);
+                        }
+                        
                         // --- ROBUST CHECK ---
-                        // This new code checks every property before trying to use it.
-                        if (result && result.videoId) {
-                            displayDownloadOptions(result);
-                            success = true;
-                            break;
+                        // Check if the response is actually JSON before trying to parse it
+                        const contentType = response.headers.get("content-type");
+                        if (contentType && contentType.indexOf("application/json") !== -1) {
+                            const result = await response.json();
+                            if (result.status === 'success' || result.status === 'stream') {
+                                displayDownloadOptions(result);
+                                success = true;
+                                break; // Success! Exit the loop.
+                            } else {
+                                // The API responded with JSON, but it was an error message
+                                throw new Error(result.text || 'API returned a non-success status.');
+                            }
                         } else {
-                            console.warn(`API at ${instance} returned invalid data.`);
-                            throw new Error('Invalid data structure');
+                            // The response was not JSON (e.g., a plain text error page)
+                            throw new Error('API did not return a valid JSON response.');
                         }
                     } catch (error) { 
-                        console.error(`Error with ${instance}:`, error);
+                        console.error(`Error with ${instance}:`, error.message);
+                        // Let the loop continue to the next instance
                     }
                 }
 
@@ -218,35 +234,19 @@
             });
 
             function displayDownloadOptions(data) {
-                // This function is now much safer and will not cause a TypeError.
                 const title = data.title || 'Untitled Video';
-                const formatStreams = Array.isArray(data.formatStreams) ? data.formatStreams : [];
-                const adaptiveFormats = Array.isArray(data.adaptiveFormats) ? data.adaptiveFormats : [];
-
                 let html = `<h3 class="text-2xl font-bold mb-4">${title}</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">`;
                 
-                const videoStreams = formatStreams
-                    .filter(f => f && f.container === 'mp4' && f.resolution && f.url)
-                    .sort((a,b) => parseInt(b.resolution) - parseInt(a.resolution));
-                
-                videoStreams.forEach(f => { 
-                    html += createLinkHtml({ url: f.url, quality: f.resolution, text: `Download Video` }); 
-                });
-                
-                const audioStreams = adaptiveFormats
-                    .filter(f => f && f.type && f.type.startsWith("audio/") && f.url)
-                    .sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0));
-
-                if (audioStreams.length > 0) { 
-                    html += createLinkHtml({ url: audioStreams[0].url, quality: 'Best Audio', text: `Download Audio` }); 
+                // Handle different response formats from different APIs
+                if (data.url) { // Single video stream (Cobalt)
+                    html += createLinkHtml({ url: data.url, quality: data.quality || 'Video', text: 'Download Video' });
                 }
-                
+                if (data.audio) { // Cobalt audio stream
+                    html += createLinkHtml({ url: data.audio, quality: 'Best Audio', text: 'Download Audio' });
+                }
+
                 html += `</div>`;
                 downloadLinksDiv.innerHTML = html;
-
-                if (videoStreams.length === 0 && audioStreams.length === 0) {
-                    showResultsError('No downloadable formats were found for this video.');
-                }
             }
 
             function createLinkHtml({ url, quality, text }) {

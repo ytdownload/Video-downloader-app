@@ -6,12 +6,27 @@ from flask_cors import CORS
 from pytube import YouTube, cipher
 from pytube.exceptions import PytubeError
 import io
+import re # Import the regular expressions module
 
 # --- App Factory Pattern for Production Stability ---
 def create_app():
     """Creates and configures the Flask app."""
     app = Flask(__name__)
     CORS(app)
+
+    # --- CRITICAL FIX for 'HTTP Error 400: Bad Request' ---
+    # Pytube can fail on certain videos because of YouTube's cipher protection.
+    # This patch manually updates the cipher regex to the latest known working version.
+    try:
+        print("Applying Pytube cipher patch...")
+        var_regex = re.compile(r"^\$*\w+\W")
+        cipher.get_transform_function_name = lambda js: (
+            var_regex.search(js).group(0)[:-1]
+        )
+        print("Pytube cipher patch applied successfully.")
+    except Exception as e:
+        print(f"Could not apply Pytube cipher patch: {e}")
+
 
     # --- Root Endpoint for Status Check ---
     @app.route('/')
@@ -33,18 +48,8 @@ def create_app():
             return jsonify({"success": False, "error": "Video URL is required."}), 400
 
         try:
-            # --- CRITICAL FIX: Add browser-like headers to the request ---
-            # This helps bypass YouTube's server-side blocking.
-            yt = YouTube(
-                video_url,
-                use_oauth=False,
-                allow_oauth_cache=True
-            )
+            yt = YouTube(video_url)
             
-            # --- CRITICAL FIX 2: Handle potential cipher errors ---
-            # This is an advanced fix for another common pytube issue.
-            cipher.get_throttling_function_name = lambda: 'action'
-
             # Get available video and audio streams
             video_streams = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc()
             audio_stream = yt.streams.filter(only_audio=True).order_by('abr').desc().first()
@@ -65,6 +70,9 @@ def create_app():
             return jsonify({"success": False, "error": "Pytube Error: The URL might be invalid, private, or age-restricted. YouTube may also be temporarily blocking our server."}), 500
         except Exception as e:
             print(f"An unexpected error occurred: {str(e)}")
+            # Check if the error is the one we are trying to fix
+            if "HTTP Error 400" in str(e):
+                 return jsonify({"success": False, "error": "Failed to process video due to YouTube API changes. The patch may need updating."}), 500
             return jsonify({"success": False, "error": "An unexpected server error occurred."}), 500
 
     # --- API Endpoint to Handle the Download ---
@@ -106,4 +114,4 @@ app = create_app()
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
-        
+    

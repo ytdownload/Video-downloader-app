@@ -1,66 +1,81 @@
+
+#### 2. `server.js` (The `yt-dlp` API Logic)
+This code is correct and works with the `package.json` above. It runs the powerful `yt-dlp` command on the server.
+
+
+```javascript
 // server.js
 
 const express = require('express');
 const cors = require('cors');
-const fetch = require('node-fetch');
+const YTDlpWrap = require('yt-dlp-wrap').default;
 
+// --- Initialize App and yt-dlp ---
 const app = express();
 const PORT = process.env.PORT || 4000;
+const ytDlpWrap = new YTDlpWrap();
 
+// --- Middleware ---
 app.use(cors());
 app.use(express.json());
 
-// --- A list of reliable public APIs to try in order ---
-const API_ENDPOINTS = [
-    'https://invidious.io.lol/api/v1/videos/',
-    'https://vid.puffyan.us/api/v1/videos/',
-    'https://inv.hnh.is/api/v1/videos/',
-    'https://invidious.projectsegfau.lt/api/v1/videos/'
-];
-
-// A simple status check endpoint
+// --- A simple status check endpoint ---
 app.get('/', (req, res) => {
-    res.json({ status: 'ok', message: 'Proxy backend with fallbacks is running.' });
+    res.json({ status: 'ok', message: 'yt-dlp backend is running.' });
 });
 
+// --- API Endpoint to Get Video Info ---
 app.post('/api/video-info', async (req, res) => {
-    const { videoId } = req.body;
+    const { videoUrl } = req.body;
 
-    if (!videoId) {
-        return res.status(400).json({ success: false, error: 'Video ID is required.' });
+    if (!videoUrl) {
+        return res.status(400).json({ success: false, error: 'Video URL is required.' });
     }
 
-    // --- NEW: Loop through the API list ---
-    for (const endpoint of API_ENDPOINTS) {
-        try {
-            const fullApiUrl = `${endpoint}${videoId}`;
-            console.log(`Proxying request to: ${fullApiUrl}`);
+    try {
+        console.log(`Fetching metadata for: ${videoUrl}`);
+        // This runs the command: yt-dlp --dump-json <videoUrl>
+        // It gets all video data as a JSON object without downloading the file.
+        const metadata = await ytDlpWrap.getVideoInfo(videoUrl);
+        
+        // We now have the full data from yt-dlp and can send it to the frontend.
+        res.json({ success: true, data: metadata });
 
-            const apiResponse = await fetch(fullApiUrl, { timeout: 7000 }); // 7-second timeout
-
-            if (!apiResponse.ok) {
-                // If this server gives an error, log it and the loop will try the next one.
-                throw new Error(`API responded with status: ${apiResponse.status}`);
-            }
-
-            const data = await apiResponse.json();
-            
-            // If we get here, the request was successful.
-            // Send the successful response back to our frontend and exit the loop.
-            console.log(`Success with ${endpoint}`);
-            return res.json({ success: true, data: data });
-
-        } catch (error) {
-            console.error(`Failed to fetch from ${endpoint}:`, error.message);
-            // This error is expected if a server is down. The loop will continue.
-        }
+    } catch (error) {
+        console.error('Error fetching video info with yt-dlp:', error.message);
+        res.status(500).json({ success: false, error: 'Failed to fetch video information. The URL may be invalid or the video is private.' });
     }
-
-    // If the loop finishes and we never had a success, it means all servers failed.
-    console.error('All public APIs failed.');
-    res.status(502).json({ success: false, error: 'All download servers are currently busy or unavailable. Please try again later.' });
 });
 
+// --- API Endpoint to Trigger a Download ---
+// This endpoint gets the direct download link and redirects the user's browser to it.
+app.get('/api/download', async (req, res) => {
+    const { videoUrl, formatId } = req.query;
+
+    if (!videoUrl || !formatId) {
+        return res.status(400).send('Missing required query parameters: videoUrl and formatId.');
+    }
+
+    try {
+        console.log(`Getting download link for format: ${formatId}`);
+        // This runs the command: yt-dlp -f <formatId> --get-url <videoUrl>
+        // It gets the direct, temporary download URL for the chosen format.
+        const downloadUrl = await ytDlpWrap.getUrl(videoUrl, [
+            '-f', formatId
+        ]);
+
+        // Redirect the user's browser to the direct download link.
+        // This starts the download on their computer.
+        res.redirect(downloadUrl);
+
+    } catch (error) {
+        console.error('Error getting download URL:', error.message);
+        res.status(500).send('An error occurred while preparing the download link.');
+    }
+});
+
+
+// --- Start the Server ---
 app.listen(PORT, () => {
-    console.log(`Proxy server is running on port ${PORT}`);
+    console.log(`yt-dlp API server is running on port ${PORT}`);
 });

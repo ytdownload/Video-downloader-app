@@ -1,0 +1,38 @@
+{
+  "name": "cobalt-api",
+  "version": "1.0.0",
+  "description": "Node.js YTDL Library for downloading videos or audio using the Cobalt API.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/code3-dev/CobaltAPI.git"
+  },
+  "keywords": [
+    "ytdl",
+    "video",
+    "audio",
+    "download",
+    "Cobalt API",
+    "YouTube",
+    "TikTok",
+    "Twitter",
+    "nodejs"
+  ],
+  "author": "Hossein Pira <h3dev.pira@gmail.com> (https://github.com/code3-dev)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/code3-dev/CobaltAPI/issues"
+  },
+  "homepage": "https://github.com/code3-dev/CobaltAPI#readme",
+  "dependencies": {
+    "@distube/ytdl-core": "^4.15.9",
+    "@stephanemoni/ytdl-core": "github:stephanemoni/ytdl-core",
+    "axios": "^1.7.2",
+    "axios-retry": "^4.5.0",
+    "dotenv": "^16.4.5",
+    "moment": "^2.30.1",
+    "node-fetch-cache": "^5.0.2",
+    "youtubei.js": "^13.2.0",
+    "yup": "^1.4.0"
+  }
+}

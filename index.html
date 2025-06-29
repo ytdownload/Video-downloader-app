@@ -1,194 +1,247 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Video Downloader - Powered by Node.js</title>
+    <title>YouTube Video Downloader</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #111827; }
-        .focus-ring:focus { outline: 2px solid transparent; outline-offset: 2px; box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.5); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
-        .loader { width: 50px; height: 50px; border-radius: 50%; position: relative; animation: rotate 1s linear infinite }
-        .loader::before , .loader::after { content: ""; box-sizing: border-box; position: absolute; inset: 0px; border-radius: 50%; border: 5px solid #FFF; animation: prixClipFix 2s linear infinite ; }
-        .loader::after{ border-color: #3b82f6; animation: prixClipFix 2s linear infinite , rotate 0.5s linear infinite reverse; inset: 6px; }
-        @keyframes rotate { 0% {transform: rotate(0deg)} 100% {transform: rotate(360deg)} }
-        @keyframes prixClipFix { 0% {clip-path:polygon(50% 50%,0 0,0 0,0 0,0 0,0 0)} 25% {clip-path:polygon(50% 50%,0 0,100% 0,100% 0,100% 0,100% 0)} 50% {clip-path:polygon(50% 50%,0 0,100% 0,100% 100%,100% 100%,100% 100%)} 75% {clip-path:polygon(50% 50%,0 0,100% 0,100% 100%,0 100%,0 100%)} 100% {clip-path:polygon(50% 50%,0 0,100% 0,100% 100%,0 100%,0 0)} }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .loader {
+            border-top-color: #3498db;
+            -webkit-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite;
+        }
+        @-webkit-keyframes spin {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
-<body class="text-gray-200">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
 
-    <header class="bg-gray-800/70 backdrop-blur-lg sticky top-0 z-50 border-b border-gray-700/50">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#home" class="text-2xl font-bold text-white">ProDownloader</a>
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="#home" class="text-gray-300 hover:text-blue-400 transition-colors">Home</a>
-                <a href="#features" class="text-gray-300 hover:text-blue-400 transition-colors">Features</a>
-                <a href="#about" class="text-gray-300 hover:text-blue-400 transition-colors">About</a>
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl">
+        
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-800 dark:text-white">YouTube Downloader</h1>
+            <p class="text-md sm:text-lg text-gray-600 dark:text-gray-400 mt-2">Paste a YouTube video URL below to get download links.</p>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 sm:p-8">
+                <!-- Input Form -->
+                <form id="download-form" class="flex flex-col sm:flex-row items-center gap-4">
+                    <div class="relative flex-grow w-full">
+                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"></path></svg>
+                        <input type="text" id="video-url" placeholder="https://www.youtube.com/watch?v=..." class="w-full pl-12 pr-4 py-3 bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:border-blue-500 focus:ring-0 rounded-xl transition duration-300" required>
+                    </div>
+                    <button type="submit" id="submit-button" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-xl shadow-md hover:shadow-lg transition duration-300 flex items-center justify-center">
+                        <span id="button-text">Get Links</span>
+                        <div id="loader" class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-6 w-6 ml-3 hidden"></div>
+                    </button>
+                </form>
+
+                <!-- Error Message -->
+                <div id="error-message" class="hidden mt-6 p-4 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 rounded-lg">
+                    <p><strong>Error:</strong> <span id="error-text"></span></p>
+                </div>
             </div>
-        </nav>
-    </header>
 
-    <main>
-        <section id="home" class="py-16 md:py-24">
-            <div class="container mx-auto px-4">
-                <div class="w-full max-w-3xl mx-auto">
-                    <div class="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl shadow-2xl overflow-hidden">
-                        <div class="p-6 md:p-8">
-                            <div class="text-center mb-8">
-                                <h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tight">Functional Video Downloader</h1>
-                                <p class="text-gray-400 mt-3 text-lg">Paste a YouTube video link to get download options.</p>
-                            </div>
-                            <div class="space-y-4">
-                                <div class="relative flex items-center">
-                                    <input type="url" id="videoUrl" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-gray-900 text-white placeholder-gray-500 px-4 py-3 rounded-xl border-2 border-gray-700 focus:outline-none focus:border-blue-500 transition-colors focus-ring">
-                                </div>
-                                <button id="getLinksBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg py-3 px-6 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] focus-ring flex items-center justify-center gap-2">
-                                    Get Download Links
-                                </button>
-                            </div>
+            <!-- Results Section -->
+            <div id="results-container" class="mt-8 hidden">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 sm:p-8">
+                    <div class="flex flex-col md:flex-row items-center gap-6">
+                        <img id="thumbnail" src="https://placehold.co/320x180/e2e8f0/4a5568?text=Thumbnail" alt="Video Thumbnail" class="w-full md:w-1/3 rounded-lg shadow-md">
+                        <div class="flex-grow">
+                            <h2 id="video-title" class="text-xl font-bold text-gray-800 dark:text-white">Video Title Goes Here</h2>
+                            <p id="video-author" class="text-gray-600 dark:text-gray-400 mt-1">by Author</p>
                         </div>
-                        <div id="results" class="px-6 md:px-8 pb-8 mt-2">
-                            <div id="loader" class="hidden flex-col items-center justify-center text-center py-8"><div class="loader"></div><p class="text-gray-400 mt-4 text-lg">Fetching video data...</p></div>
-                            <div id="errorMessage" class="hidden"></div>
-                            <div id="downloadOptions" class="hidden"></div>
-                        </div>
+                    </div>
+                    <div id="download-links" class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Download links will be inserted here -->
                     </div>
                 </div>
             </div>
-        </section>
-        
-        <!-- Other sections (Features, About) remain the same -->
-        <section id="features" class="py-16 md:py-24 bg-gray-900">
-            <!-- Feature content from previous version -->
-        </section>
-        <section id="about" class="py-16 md:py-24">
-            <!-- About content from previous version -->
-        </section>
-    </main>
+        </main>
 
-    <footer class="bg-gray-900 border-t border-gray-800">
-        <!-- Footer content from previous version -->
-    </footer>
+        <!-- Footer -->
+        <footer class="text-center mt-12 text-sm text-gray-500 dark:text-gray-400">
+            <p>Disclaimer: This tool is for personal use only. Please respect the copyright of the content creators.</p>
+            <p class="mt-1">Powered by <a href="https://co.wuk.sh/" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">Cobalt</a> API.</p>
+        </footer>
+
+    </div>
 
     <script>
-        // --- UI Elements ---
-        const getLinksBtn = document.getElementById('getLinksBtn');
-        const videoUrlInput = document.getElementById('videoUrl');
+        // DOM Elements
+        const form = document.getElementById('download-form');
+        const urlInput = document.getElementById('video-url');
+        const submitButton = document.getElementById('submit-button');
+        const buttonText = document.getElementById('button-text');
         const loader = document.getElementById('loader');
-        const downloadOptionsDiv = document.getElementById('downloadOptions');
-        const errorMessageDiv = document.getElementById('errorMessage');
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        const resultsContainer = document.getElementById('results-container');
+        const thumbnail = document.getElementById('thumbnail');
+        const videoTitle = document.getElementById('video-title');
+        const videoAuthor = document.getElementById('video-author');
+        const downloadLinksContainer = document.getElementById('download-links');
 
-        // --- Event Listeners ---
-        getLinksBtn.addEventListener('click', handleGetLinks);
-        videoUrlInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleGetLinks(); });
+        // The public API endpoint
+        const API_ENDPOINT = "https://co.wuk.sh/api/json";
 
-        async function handleGetLinks() {
-            const videoURL = videoUrlInput.value.trim();
-            resetUI();
+        /**
+         * Handles the form submission.
+         * @param {Event} e - The form submission event.
+         */
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const videoUrl = urlInput.value.trim();
 
-            if (!videoURL) {
-                showError('Please paste a video URL.');
+            if (!videoUrl) {
+                showError("Please enter a YouTube URL.");
                 return;
             }
 
-            loader.classList.remove('hidden');
-            loader.classList.add('flex');
+            // Reset UI
+            hideError();
+            resultsContainer.classList.add('hidden');
+            downloadLinksContainer.innerHTML = '';
+            setLoading(true);
 
             try {
-                // *** THIS IS THE KEY CHANGE ***
-                // Fetch data from our Node.js server's API endpoint
-                const liveServerURL = 'https://video-downloader-app-97zm.onrender.com'; // <-- PASTE YOUR RENDER URL HERE
-const response = await fetch(`${liveServerURL}/video-info?videoURL=${encodeURIComponent(videoURL)}`);
-                const data = await response.json();
+                // Prepare the request to the Cobalt API
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        url: videoUrl,
+                        vQuality: '1080', // Request a good default quality
+                        isAudioOnly: false
+                    })
+                });
 
-                if (!data.success) {
-                    // Handle errors sent from the server
-                    throw new Error(data.error);
+                const result = await response.json();
+
+                // Check for errors from the API
+                if (result.status === 'error' || result.status === 'redirect') {
+                     showError(result.text || "Could not process the video. The URL might be invalid or private.");
+                } else if (result.status === 'stream') {
+                    // On success, display the results
+                    displayResults(result);
+                } else {
+                    showError("An unknown error occurred. The API might be down.");
                 }
 
-                // If successful, display the results
-                displayResults(data);
-
-            } catch (error) {
-                showError(error.message || 'An unknown error occurred.');
+            } catch (err) {
+                console.error("Fetch error:", err);
+                showError("Failed to connect to the download service. Please check your internet connection or try again later.");
             } finally {
-                loader.classList.add('hidden');
-                loader.classList.remove('flex');
+                setLoading(false);
             }
-        }
+        });
 
+        /**
+         * Displays the video information and download links.
+         * @param {object} data - The API response data.
+         */
         function displayResults(data) {
-            downloadOptionsDiv.innerHTML = ''; // Clear previous results
+            thumbnail.src = data.picker.find(p => p.type === 'video')?.thumb || 'https://placehold.co/320x180/e2e8f0/4a5568?text=Thumbnail';
+            videoTitle.textContent = data.picker.find(p => p.type === 'video')?.title || 'Unknown Title';
+            videoAuthor.textContent = `by ${data.picker.find(p => p.type === 'video')?.author || 'Unknown Author'}`;
 
-            // --- Create and display results header (thumbnail, title) ---
-            const headerHtml = `
-                <div class="bg-gray-700/50 rounded-xl p-4 flex flex-col sm:flex-row items-center gap-5 mb-6">
-                    <img src="${data.thumbnail}" alt="Video Thumbnail" class="w-full sm:w-40 h-auto object-cover rounded-lg shadow-lg">
-                    <div class="text-center sm:text-left">
-                        <h2 class="text-xl font-bold text-white">${data.title}</h2>
-                        <p class="text-sm text-gray-400 mt-1">Select a format to download.</p>
-                    </div>
-                </div>`;
-            downloadOptionsDiv.insertAdjacentHTML('beforeend', headerHtml);
-            
-            // --- Filter and display formats ---
-            const videoFormats = data.formats.filter(f => f.hasVideo && f.hasAudio && f.quality);
-            const audioFormats = data.formats.filter(f => !f.hasVideo && f.hasAudio && f.quality);
-
-            if (videoFormats.length > 0) {
-                downloadOptionsDiv.insertAdjacentHTML('beforeend', createFormatTable('Video + Audio', videoFormats));
-            }
-            if (audioFormats.length > 0) {
-                downloadOptionsDiv.insertAdjacentHTML('beforeend', createFormatTable('Audio Only', audioFormats));
+            // Create video download links
+            if (data.picker) {
+                data.picker.forEach(item => {
+                    if (item.url) {
+                        const quality = item.quality ? `${item.quality}p` : (item.type === 'audio' ? 'Audio' : 'Video');
+                        const format = item.format || 'mp4';
+                        const link = createDownloadButton(item.url, `${quality} (${format.toUpperCase()})`, item.type);
+                        downloadLinksContainer.appendChild(link);
+                    }
+                });
             }
             
-            downloadOptionsDiv.classList.remove('hidden');
-            downloadOptionsDiv.classList.add('fade-in');
+            // Add the main audio-only link if available
+            if(data.audio) {
+                 const audioLink = createDownloadButton(data.audio, 'Best Audio (MP3)', 'audio');
+                 downloadLinksContainer.appendChild(audioLink);
+            }
+
+
+            resultsContainer.classList.remove('hidden');
         }
 
-        function createFormatTable(title, formats) {
-            let rows = formats.map(format => `
-                <tr class="border-b border-gray-700/50 last:border-b-0">
-                    <td class="p-4 font-medium text-white">${format.quality}</td>
-                    <td class="p-4 text-gray-400">${format.container.toUpperCase()}</td>
-                    <td class="p-4 text-right">
-                        <a href="${format.url}" target="_blank" download class="inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-colors focus-ring">Download</a>
-                    </td>
-                </tr>`).join('');
-
-            return `
-                <div class="mb-6">
-                    <h3 class="text-lg font-semibold mb-3 text-gray-300">${title}</h3>
-                    <div class="overflow-hidden bg-gray-900/50 rounded-xl border border-gray-700/50">
-                        <table class="w-full text-left">
-                            <thead class="bg-gray-700/30"><tr>
-                                <th class="p-4 font-semibold text-sm text-gray-300 uppercase tracking-wider">Quality</th>
-                                <th class="p-4 font-semibold text-sm text-gray-300 uppercase tracking-wider">Format</th>
-                                <th class="p-4"></th>
-                            </tr></thead>
-                            <tbody class="divide-y divide-gray-700/50">${rows}</tbody>
-                        </table>
-                    </div>
-                </div>`;
+        /**
+         * Creates a styled download button.
+         * @param {string} url - The download URL.
+         * @param {string} text - The text to display on the button.
+         * @param {string} type - 'video' or 'audio'.
+         * @returns {HTMLAnchorElement} The created anchor element.
+         */
+        function createDownloadButton(url, text, type) {
+            const link = document.createElement('a');
+            link.href = url;
+            link.target = '_blank'; // Open in new tab to start download
+            link.rel = 'noopener noreferrer';
+            
+            const bgColor = type === 'audio' ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600';
+            
+            link.className = `flex items-center justify-center gap-2 p-3 ${bgColor} text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition duration-300`;
+            
+            const iconSvg = type === 'audio' 
+                ? `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>`
+                : `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"></path><rect width="14" height="12" x="2" y="6" rx="2" ry="2"></rect></svg>`;
+            
+            link.innerHTML = `${iconSvg}<span>${text}</span>`;
+            
+            return link;
         }
 
+        /**
+         * Sets the loading state of the UI.
+         * @param {boolean} isLoading - Whether to show the loader.
+         */
+        function setLoading(isLoading) {
+            if (isLoading) {
+                buttonText.classList.add('hidden');
+                loader.classList.remove('hidden');
+                submitButton.disabled = true;
+                submitButton.classList.add('cursor-not-allowed');
+            } else {
+                buttonText.classList.remove('hidden');
+                loader.classList.add('hidden');
+                submitButton.disabled = false;
+                submitButton.classList.remove('cursor-not-allowed');
+            }
+        }
+
+        /**
+         * Shows an error message in the UI.
+         * @param {string} message - The error message to display.
+         */
         function showError(message) {
-            errorMessageDiv.innerHTML = `<div class="bg-red-500/10 border border-red-500/30 text-red-300 px-4 py-3 rounded-xl" role="alert"><p class="font-bold">Error</p><p class="text-sm">${message}</p></div>`;
-            errorMessageDiv.classList.remove('hidden');
-            errorMessageDiv.classList.add('fade-in');
+            errorText.textContent = message;
+            errorMessage.classList.remove('hidden');
         }
 
-        function resetUI() {
-            errorMessageDiv.classList.add('hidden');
-            downloadOptionsDiv.classList.add('hidden');
-            downloadOptionsDiv.innerHTML = '';
-            errorMessageDiv.classList.remove('fade-in');
-            downloadOptionsDiv.classList.remove('fade-in');
+        /**
+         * Hides the error message.
+         */
+        function hideError() {
+            errorMessage.classList.add('hidden');
         }
     </script>
 </body>

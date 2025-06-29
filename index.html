@@ -105,12 +105,6 @@
 
         } catch (error) {
             console.error("FIREBASE INITIALIZATION FAILED:", error);
-            const debugStatus = document.getElementById('debug-status');
-            debugStatus.classList.remove('hidden');
-            debugStatus.innerHTML = `<strong>Firebase Connection FAILED.</strong><br><em>${error.message}</em>`;
-            debugStatus.style.backgroundColor = '#fee2e2';
-            debugStatus.style.color = '#991b1b';
-            document.getElementById('login-section').style.display = 'none';
         }
 
         // --- Function to set up all authentication logic ---
@@ -150,20 +144,11 @@
                 try {
                     await signInWithEmailAndPassword(auth, email, password);
                 } catch (error) {
-                    // --- THE FIX IS HERE ---
-                    // If sign in fails, check for specific errors to decide if we should create a new account.
                     if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-login-credentials') {
                         try {
-                            // If the user doesn't exist, create a new account for them.
                             await createUserWithEmailAndPassword(auth, email, password);
-                        } catch (signupError) { 
-                            // Show any errors that happen during signup (e.g., weak password)
-                            showAuthError(signupError.message); 
-                        }
-                    } else {
-                        // For all other errors, just show the message.
-                        showAuthError(error.message);
-                    }
+                        } catch (signupError) { showAuthError(signupError.message); }
+                    } else { showAuthError(error.message); }
                 }
             });
 
@@ -192,7 +177,7 @@
             const resultsErrorDiv = document.getElementById('results-error');
             const downloadLinksDiv = document.getElementById('download-links');
 
-            const INVIDIOUS_INSTANCES = ['https://vid.puffyan.us', 'https://invidious.io.lol', 'https://inv.hnh.is'];
+            const INVIDIOUS_INSTANCES = ['https://vid.puffyan.us', 'https://invidious.io.lol', 'https://inv.hnh.is', 'https://invidious.projectsegfau.lt'];
 
             function getYouTubeVideoId(url) {
                 const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/;
@@ -213,17 +198,30 @@
                         const response = await fetch(`${instance}/api/v1/videos/${videoId}`);
                         if (!response.ok) throw new Error('API request failed');
                         const result = await response.json();
-                        displayDownloadOptions(result);
-                        success = true;
-                        break;
-                    } catch (error) { console.error(`Error with ${instance}:`, error); }
+                        
+                        // --- THE FIX IS HERE ---
+                        // Check if the result is a valid object with the properties we need
+                        if (result && result.formatStreams && result.adaptiveFormats) {
+                            displayDownloadOptions(result);
+                            success = true;
+                            break; // Exit the loop because we found a working server
+                        } else {
+                            // The server responded, but didn't give us video data. Try the next server.
+                            console.warn(`API at ${instance} returned invalid data.`);
+                            throw new Error('Invalid data structure from API');
+                        }
+                    } catch (error) { 
+                        console.error(`Error with ${instance}:`, error);
+                        // Let the loop continue to the next instance
+                    }
                 }
 
-                if (!success) { showResultsError('Could not fetch video. Servers may be busy or the video is unavailable.'); }
+                if (!success) { showResultsError('Could not fetch video. All servers may be busy or the video is unavailable.'); }
                 setDownloaderLoading(false);
             });
 
             function displayDownloadOptions(data) {
+                // This function is now safe because we check the data before calling it.
                 const { title, formatStreams, adaptiveFormats } = data;
                 let html = `<h3 class="text-2xl font-bold mb-4">${title}</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">`;
                 const videoStreams = formatStreams.filter(f => f.container === 'mp4' && f.resolution).sort((a,b) => parseInt(b.resolution) - parseInt(a.resolution));

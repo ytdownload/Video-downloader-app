@@ -74,10 +74,8 @@
         const errorMessageDiv = document.getElementById('error-message');
         const downloadLinksDiv = document.getElementById('download-links');
         
-        // --- !!! IMPORTANT !!! ---
-        // --- REPLACE THIS WITH YOUR RENDER.COM BACKEND URL ---
+        // --- !!! CRITICAL: UPDATE THIS URL !!! ---
         const API_BASE_URL = 'https://your-app-name.onrender.com'; 
-        // For local testing: const API_BASE_URL = 'http://localhost:4000';
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault(); 
@@ -101,14 +99,14 @@
                 const result = await response.json();
 
                 if (!result.success) {
-                    showError(result.error); // Display the specific error from the backend
+                    showError(result.error);
                 } else {
                     displayDownloadOptions(result, videoUrl);
                 }
 
             } catch (error) {
                 console.error('Frontend Fetch Error:', error);
-                showError('Could not connect to the server. Please check your internet connection or try again later.');
+                showError('Could not connect to the server. Please check the server status and your internet connection.');
             } finally {
                 setLoadingState(false);
             }

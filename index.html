@@ -64,7 +64,7 @@
                     <button 
                         type="submit"
                         id="download-btn"
-                        class="bg-blue-600 text-white font-semibold px-8 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
+                        class="bg-blue-600 text-white font-semibold px-8 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="mr-2" viewBox="0 0 16 16">
                           <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
@@ -90,6 +90,7 @@
         </div>
     </main>
 
+    <!-- (The rest of the HTML for Features, About, and Footer remains the same) -->
     <!-- Features Section -->
     <section id="features" class="bg-white py-16 md:py-24">
         <div class="container mx-auto px-6">
@@ -103,14 +104,14 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v13A1.5 1.5 0 0 0 1.5 16h13a1.5 1.5 0 0 0 1.5-1.5v-13A1.5 1.5 0 0 0 14.5 0h-13zM8 8a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
                     </div>
                     <h3 class="text-xl font-semibold mb-2">Multiple Formats</h3>
-                    <p class="text-gray-600">Download videos in MP4, WEBM, and as audio-only MP3 files.</p>
+                    <p class="text-gray-600">Download videos in MP4 and as audio-only files.</p>
                 </div>
                 <div class="p-6">
                     <div class="flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white mx-auto mb-4">
                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M11.536 6.012a.5.5 0 0 1 .707 0l2.121 2.121a.5.5 0 0 1 0 .707L11.536 10.96a.5.5 0 0 1-.707-.707L12.646 8.5H3.5a.5.5 0 0 1 0-1h9.146L11.536 6.012a.5.5 0 0 1 0-.707z"/><path d="M1.5 2.5A1.5 1.5 0 0 1 3 1h10a1.5 1.5 0 0 1 1.5 1.5v11A1.5 1.5 0 0 1 13 15H3a1.5 1.5 0 0 1-1.5-1.5v-11zM3 2a.5.5 0 0 0-.5.5v11a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5v-11a.5.5 0 0 0-.5-.5H3z"/></svg>
                     </div>
                     <h3 class="text-xl font-semibold mb-2">High Quality</h3>
-                    <p class="text-gray-600">Get the best available quality for your downloads, including 720p, 1080p, and more.</p>
+                    <p class="text-gray-600">Get the best available quality for your downloads, including 1080p, 720p, and more.</p>
                 </div>
                 <div class="p-6">
                     <div class="flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white mx-auto mb-4">
@@ -129,7 +130,7 @@
             <div class="max-w-4xl mx-auto text-center">
                  <h2 class="text-3xl font-bold mb-4">About Us</h2>
                  <p class="text-gray-600 leading-relaxed">
-                    RapidGrab was created to provide a simple, fast, and reliable way to download YouTube videos for offline viewing. We believe in open access to content and built this tool to be free and easy for everyone to use. Our service is powered by the excellent <a href="https://cobalt.tools/" target="_blank" rel="noopener" class="text-blue-600 hover:underline">Cobalt API</a>, ensuring stable and versatile download options. We are committed to maintaining a user-friendly and ad-free experience.
+                    RapidGrab was created to provide a simple, fast, and reliable way to download YouTube videos for offline viewing. We believe in open access to content and built this tool to be free and easy for everyone to use. Our service is powered by a powerful public API, ensuring stable and versatile download options. We are committed to maintaining a user-friendly and ad-free experience.
                  </p>
             </div>
         </div>
@@ -142,156 +143,125 @@
         </div>
     </footer>
 
+
     <script>
         // --- DOM Element Selection ---
         const form = document.getElementById('download-form');
         const urlInput = document.getElementById('video-url');
         const downloadBtn = document.getElementById('download-btn');
-        const resultsSection = document.getElementById('results-section');
         const loadingSpinner = document.getElementById('loading');
         const errorMessageDiv = document.getElementById('error-message');
         const downloadLinksDiv = document.getElementById('download-links');
-
-        // --- Cobalt API Endpoint with a more robust CORS Proxy ---
-        // Using corsproxy.io which is generally reliable for POST requests.
-        const PROXY_URL = 'https://corsproxy.io/?';
-        const TARGET_API_URL = 'https://api.cobalt.tools/api/json';
-        const COBALT_API_URL = `${PROXY_URL}${encodeURIComponent(TARGET_API_URL)}`;
+        
+        // --- Backend API URL ---
+        // This should point to the address where your Node.js server is running.
+        const API_BASE_URL = 'http://localhost:4000';
 
         // --- Event Listener for Form Submission ---
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Prevent default form submission
+            e.preventDefault(); 
             const videoUrl = urlInput.value.trim();
 
             if (!videoUrl) {
-                showError('Please enter a YouTube URL.');
+                showError('Please paste a YouTube URL.');
                 return;
             }
             
-            // Reset UI for new request
             resetUI();
             loadingSpinner.classList.remove('hidden');
+            downloadBtn.disabled = true;
 
             try {
-                // --- Make API Request to Cobalt via Proxy ---
-                const response = await fetch(COBALT_API_URL, {
+                // Call our backend's /api/video-info endpoint
+                const response = await fetch(`${API_BASE_URL}/api/video-info`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json',
                     },
-                    body: JSON.stringify({ url: videoUrl }),
+                    body: JSON.stringify({ videoUrl: videoUrl }),
                 });
 
-                if (!response.ok) {
-                     // Log the detailed error response
-                    const errorText = await response.text();
-                    console.error('API Response Error:', response.status, response.statusText, errorText);
-                    throw new Error(`API returned an error: ${response.status}`);
+                const result = await response.json();
+
+                if (!result.success) {
+                    // If the backend returns an error, display it
+                    showError(result.error);
+                } else {
+                    // If successful, display the download options
+                    displayDownloadOptions(result, videoUrl);
                 }
 
-                const result = await response.json();
-                loadingSpinner.classList.add('hidden');
-                
-                // --- Handle API Response ---
-                handleApiResponse(result);
-
             } catch (error) {
-                console.error('Fetch Error:', error);
+                console.error('Frontend Fetch Error:', error);
+                showError('Could not connect to the server. Please make sure it is running and accessible.');
+            } finally {
                 loadingSpinner.classList.add('hidden');
-                showError('Request failed. The API might be temporarily down or the URL is not supported.');
+                downloadBtn.disabled = false;
             }
         });
 
         /**
-         * Handles the JSON response from the Cobalt API and updates the UI accordingly.
-         * @param {object} result - The parsed JSON response from the API.
+         * Displays download options returned from the backend.
+         * @param {object} data - The API response data.
+         * @param {string} originalUrl - The original YouTube URL submitted by the user.
          */
-        function handleApiResponse(result) {
-            switch (result.status) {
-                case 'error':
-                    showError(result.text || 'An unknown error occurred.');
-                    break;
-                case 'redirect':
-                case 'stream':
-                    // This status means a direct download link is available.
-                    displayDownloadLink({
-                        url: result.url,
-                        type: 'video',
-                        quality: 'Best',
-                        text: 'Direct Download'
-                    });
-                    break;
-                case 'picker':
-                    // This status provides multiple download options.
-                    displayPickerOptions(result.picker);
-                    break;
-                default:
-                    showError(`Received an unhandled status: ${result.status}`);
-                    break;
-            }
-        }
+        function displayDownloadOptions(data, originalUrl) {
+            const { title, videoFormats, bestAudio } = data;
 
-        /**
-         * Displays multiple download options from the 'picker' response.
-         * @param {Array<object>} pickerItems - An array of download options.
-         */
-        function displayPickerOptions(pickerItems) {
-            if (!pickerItems || pickerItems.length === 0) {
-                showError('No download options were found.');
-                return;
+            const videoHeader = document.createElement('h3');
+            videoHeader.className = 'col-span-full text-2xl font-bold text-left mb-3';
+            videoHeader.textContent = title;
+            downloadLinksDiv.appendChild(videoHeader);
+
+            if (videoFormats && videoFormats.length > 0) {
+                const header = document.createElement('h4');
+                header.className = 'col-span-full text-xl font-semibold text-left mb-2';
+                header.textContent = 'Video (MP4)';
+                downloadLinksDiv.appendChild(header);
+                
+                videoFormats
+                    .sort((a,b) => parseInt(b.quality) - parseInt(a.quality)) // Sort by quality descending
+                    .forEach(format => {
+                        displayDownloadLink({
+                            itag: format.itag,
+                            quality: format.quality,
+                            text: `Download MP4`,
+                            videoUrl: originalUrl,
+                            title: title
+                        });
+                    });
+            }
+
+            if (bestAudio) {
+                const header = document.createElement('h4');
+                header.className = 'col-span-full text-xl font-semibold text-left mb-2 mt-4';
+                header.textContent = 'Audio Only';
+                downloadLinksDiv.appendChild(header);
+                displayDownloadLink({
+                    itag: bestAudio.itag,
+                    quality: bestAudio.quality,
+                    text: `Download Audio`,
+                    videoUrl: originalUrl,
+                    title: title
+                });
             }
             
-            // Group items by type to ensure consistent ordering
-            const videoItems = pickerItems.filter(item => item.type !== 'audio');
-            const audioItems = pickerItems.filter(item => item.type === 'audio');
-
-            // Display Video Options First
-            if (videoItems.length > 0) {
-                const videoHeader = document.createElement('h3');
-                videoHeader.className = 'col-span-full text-xl font-semibold text-left mb-2';
-                videoHeader.textContent = 'Video Options';
-                downloadLinksDiv.appendChild(videoHeader);
-                videoItems.forEach(item => {
-                    displayDownloadLink({
-                        url: item.url,
-                        type: 'video',
-                        quality: item.quality || 'SD',
-                        text: item.label || 'Download Video'
-                    });
-                });
-            }
-
-            // Display Audio Options Second
-            if (audioItems.length > 0) {
-                const audioHeader = document.createElement('h3');
-                audioHeader.className = 'col-span-full text-xl font-semibold text-left mb-2 mt-4';
-                audioHeader.textContent = 'Audio Options';
-                downloadLinksDiv.appendChild(audioHeader);
-                audioItems.forEach(item => {
-                    displayDownloadLink({
-                        url: item.url,
-                        type: 'audio',
-                        quality: 'MP3', // Cobalt typically provides MP3 for audio
-                        text: 'Download Audio'
-                    });
-                });
+            if ((!videoFormats || videoFormats.length === 0) && !bestAudio) {
+                 showError('No downloadable formats were found for this video.');
             }
         }
 
         /**
-         * Creates and appends a single download link button to the results container.
+         * Creates and appends a single download link button.
          * @param {object} linkInfo - Information about the download link.
-         * @param {string} linkInfo.url - The download URL.
-         * @param {string} linkInfo.type - The type of file (e.g., 'video', 'audio').
-         * @param {string} linkInfo.quality - The quality label (e.g., '1080p', 'MP3').
-         * @param {string} linkInfo.text - The button text.
          */
-        function displayDownloadLink({ url, type, quality, text }) {
+        function displayDownloadLink({ itag, quality, text, videoUrl, title }) {
+            // Construct the download URL for our backend's /api/download endpoint
+            const downloadUrl = `${API_BASE_URL}/api/download?videoUrl=${encodeURIComponent(videoUrl)}&itag=${itag}&title=${encodeURIComponent(title)}`;
+            
             const link = document.createElement('a');
-            link.href = url;
-            link.target = '_blank'; // Open in new tab to start download
-            link.rel = 'noopener noreferrer';
+            link.href = downloadUrl;
+            // No target="_blank" is needed as the 'Content-Disposition' header will force a download.
             link.className = 'block bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105 text-center';
             
             const qualitySpan = `<span class="block text-sm font-normal opacity-80">${quality}</span>`;
@@ -315,9 +285,8 @@
         function resetUI() {
             loadingSpinner.classList.add('hidden');
             errorMessageDiv.classList.add('hidden');
-            downloadLinksDiv.innerHTML = ''; // Clear previous links
+            downloadLinksDiv.innerHTML = '';
         }
     </script>
 </body>
-            </html>
-                                                                                                                                                                                                                                                                                    
+</html>

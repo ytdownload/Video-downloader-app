@@ -3,7 +3,6 @@
 // --- 1. Import Dependencies ---
 const express = require('express');
 const cors = require('cors');
-// Use the stable 'play-dl' library
 const play = require('play-dl');
 
 // --- 2. Setup Express App ---
@@ -14,7 +13,20 @@ const PORT = process.env.PORT || 4000;
 app.use(cors());
 app.use(express.json());
 
-// --- 4. Root Endpoint for Status Check ---
+// --- 4. CRITICAL FIX: Refresh play-dl Authorization on Start ---
+// This attempts to get fresh, unblocked cookies from YouTube when the server starts.
+(async () => {
+    try {
+        console.log("Refreshing play-dl authorization...");
+        await play.authorization();
+        console.log("play-dl authorization refreshed successfully.");
+    } catch (e) {
+        console.error("Failed to refresh play-dl authorization:", e);
+    }
+})();
+
+
+// --- 5. Root Endpoint for Status Check ---
 app.get('/', (req, res) => {
     res.json({
         status: 'ok',
@@ -22,7 +34,7 @@ app.get('/', (req, res) => {
     });
 });
 
-// --- 5. API Endpoint to Get Video Info ---
+// --- 6. API Endpoint to Get Video Info ---
 app.post('/api/video-info', async (req, res) => {
     const { videoUrl } = req.body;
 
@@ -32,7 +44,6 @@ app.post('/api/video-info', async (req, res) => {
 
     try {
         console.log(`Fetching info for: ${videoUrl}`);
-        // Validate the URL using play-dl
         if (play.yt_validate(videoUrl) !== 'video') {
              return res.status(400).json({ success: false, error: 'Invalid or unsupported YouTube URL.' });
         }
@@ -41,7 +52,6 @@ app.post('/api/video-info', async (req, res) => {
         const title = videoInfo.video_details.title;
         console.log(`Successfully fetched info for: ${title}`);
 
-        // play-dl provides formats differently
         const videoFormats = videoInfo.format
             .filter(f => f.mime_type.includes('mp4') && f.audio_channels > 0)
             .map(format => ({
@@ -67,12 +77,12 @@ app.post('/api/video-info', async (req, res) => {
 
     } catch (error) {
         console.error('--- PLAY-DL ERROR ---');
-        console.error(error);
-        res.status(500).json({ success: false, error: 'Failed to fetch video info. The video may be private, age-restricted, or unavailable.' });
+        console.error(error.message); // Log the specific error message
+        res.status(500).json({ success: false, error: 'Failed to fetch video info. The server is likely being blocked by YouTube.' });
     }
 });
 
-// --- 6. API Endpoint to Handle the Download Stream ---
+// --- 7. API Endpoint to Handle the Download Stream ---
 app.get('/api/download', async (req, res) => {
     const { videoUrl, itag, title } = req.query;
 
@@ -82,11 +92,7 @@ app.get('/api/download', async (req, res) => {
     
     try {
         console.log(`Starting download for: ${title} (itag: ${itag})`);
-        // Stream using play-dl
         const stream = await play.stream(videoUrl, {
-            quality: 2, // fallback quality
-            discordPlayerCompatibility: true,
-            seek: 0,
             itag: itag
         });
 
@@ -104,7 +110,7 @@ app.get('/api/download', async (req, res) => {
 });
 
 
-// --- 7. Start the Server ---
+// --- 8. Start the Server ---
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

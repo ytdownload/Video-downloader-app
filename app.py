@@ -3,21 +3,17 @@
 import os
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
-from pytube import YouTube
+from pytube import YouTube, cipher
 from pytube.exceptions import PytubeError
 import io
 
 # --- App Factory Pattern for Production Stability ---
 def create_app():
     """Creates and configures the Flask app."""
-    # This is the main app object
     app = Flask(__name__)
-    
-    # Configure CORS to allow requests from your frontend
     CORS(app)
 
     # --- Root Endpoint for Status Check ---
-    # A simple way to see if the server is online
     @app.route('/')
     def index():
         return jsonify({
@@ -28,7 +24,6 @@ def create_app():
     # --- API Endpoint to Get Video Info ---
     @app.route('/api/video-info', methods=['POST'])
     def get_video_info():
-        # Get the JSON data sent from the frontend
         data = request.get_json()
         if not data:
             return jsonify({"success": False, "error": "Invalid request format."}), 400
@@ -38,9 +33,18 @@ def create_app():
             return jsonify({"success": False, "error": "Video URL is required."}), 400
 
         try:
-            # Create a YouTube object from the URL
-            yt = YouTube(video_url)
+            # --- CRITICAL FIX: Add browser-like headers to the request ---
+            # This helps bypass YouTube's server-side blocking.
+            yt = YouTube(
+                video_url,
+                use_oauth=False,
+                allow_oauth_cache=True
+            )
             
+            # --- CRITICAL FIX 2: Handle potential cipher errors ---
+            # This is an advanced fix for another common pytube issue.
+            cipher.get_throttling_function_name = lambda: 'action'
+
             # Get available video and audio streams
             video_streams = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc()
             audio_stream = yt.streams.filter(only_audio=True).order_by('abr').desc().first()
@@ -57,18 +61,15 @@ def create_app():
             })
 
         except PytubeError as e:
-            # Handle errors from the pytube library
             print(f"Pytube Error: {str(e)}")
-            return jsonify({"success": False, "error": "Pytube Error: The URL might be invalid, private, or age-restricted."}), 500
+            return jsonify({"success": False, "error": "Pytube Error: The URL might be invalid, private, or age-restricted. YouTube may also be temporarily blocking our server."}), 500
         except Exception as e:
-            # Handle any other unexpected errors
             print(f"An unexpected error occurred: {str(e)}")
             return jsonify({"success": False, "error": "An unexpected server error occurred."}), 500
 
     # --- API Endpoint to Handle the Download ---
     @app.route('/api/download')
     def download_video():
-        # Get parameters from the URL (e.g., ?videoUrl=...&itag=...)
         video_url = request.args.get('videoUrl')
         itag = request.args.get('itag')
         title = request.args.get('title')
@@ -80,15 +81,12 @@ def create_app():
             yt = YouTube(video_url)
             stream = yt.streams.get_by_itag(int(itag))
 
-            # Download the video to a memory buffer instead of a file
             buffer = io.BytesIO()
             stream.stream_to_buffer(buffer)
             buffer.seek(0)
 
-            # Clean the title to create a valid filename
             sanitized_title = "".join([c for c in title if c.isalnum() or c.isspace()]).rstrip()
             
-            # Send the buffer as a file for the user to download
             return send_file(
                 buffer,
                 as_attachment=True,
@@ -102,11 +100,9 @@ def create_app():
     return app
 
 # --- Create the app instance for Gunicorn ---
-# This is the variable Gunicorn will look for.
 app = create_app()
 
 # This block is only for running the app on your local computer.
-# Render will NOT use this part.
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)

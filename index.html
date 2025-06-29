@@ -174,8 +174,8 @@
             const resultsErrorDiv = document.getElementById('results-error');
             const downloadLinksDiv = document.getElementById('download-links');
 
-            // Using a reliable public API that is known to work with CORS
-            const API_ENDPOINT = 'https://invidious.io.lol/api/v1/videos/';
+            // --- CRITICAL: This is the URL of YOUR backend on Render ---
+            const BACKEND_API_URL = 'https://video-downloader-app-dxwe.onrender.com';
 
             function getYouTubeVideoId(url) {
                 const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/;
@@ -191,21 +191,25 @@
                 setDownloaderLoading(true);
 
                 try {
-                    const fullApiUrl = `${API_ENDPOINT}${videoId}`;
-                    console.log(`Fetching from: ${fullApiUrl}`);
-                    
-                    const response = await fetch(fullApiUrl);
+                    // Our frontend calls OUR backend
+                    const response = await fetch(`${BACKEND_API_URL}/api/video-info`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ videoId: videoId }),
+                    });
 
                     if (!response.ok) {
-                        throw new Error(`The server responded with an error (Status: ${response.status}). The video may be private or deleted.`);
+                        throw new Error(`The server responded with an error.`);
                     }
                     
                     const result = await response.json();
 
-                    if (result && result.videoId) {
-                        displayDownloadOptions(result);
+                    if (result.success) {
+                        displayDownloadOptions(result.data);
                     } else {
-                        throw new Error('The API returned invalid data. The video may not be available.');
+                        throw new Error(result.error || 'The backend returned an unknown error.');
                     }
                 } catch (error) { 
                     console.error('Download Error:', error);

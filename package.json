@@ -1,7 +1,7 @@
 {
-  "name": "rapidgrab-yt-dlp-backend",
-  "version": "1.1.0",
-  "description": "A backend API using the yt-dlp command-line tool.",
+  "name": "rapidgrab-yt-dlp-backend-final",
+  "version": "1.2.0",
+  "description": "The final backend API using the yt-dlp command-line tool.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

@@ -1,7 +1,7 @@
 {
-  "name": "rapidgrab-nodejs-backend",
-  "version": "2.0.0",
-  "description": "Node.js backend for RapidGrab YouTube Downloader",
+  "name": "rapidgrab-nodejs-final",
+  "version": "3.0.0",
+  "description": "Final Node.js backend for RapidGrab YouTube Downloader",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -9,8 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@distube/ytdl-core": "^2.1.7",
     "cors": "^2.8.5",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "play-dl": "^1.9.7"
   }
 }

@@ -1,4 +1,12 @@
-const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+const express = require('express');
+const cors = require('cors');
+const fetch = require('node-fetch'); // <- directly require it
+
+const app = express();
+const PORT = process.env.PORT || 4000;
+
+app.use(cors());
+app.use(express.json());
 
 app.post('/api/video-info', async (req, res) => {
   const { videoUrl } = req.body;
@@ -13,7 +21,7 @@ app.post('/api/video-info', async (req, res) => {
     }
 
     const videoFormats = data.download.filter(x => x.type === 'video').map(f => ({
-      itag: f.url, // use direct link
+      itag: f.url,
       quality: f.quality || f.subname || f.sub
     }));
 
@@ -28,6 +36,11 @@ app.post('/api/video-info', async (req, res) => {
         : null
     });
   } catch (err) {
+    console.log('API error:', err);
     res.json({ success: false, error: 'Proxy API failed' });
   }
+});
+
+app.listen(PORT, () => {
+  console.log(`✅ Server running on http://localhost:${PORT}`);
 });

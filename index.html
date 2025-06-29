@@ -165,7 +165,7 @@
             }
         }
 
-        // --- COMPLETELY REWRITTEN DOWNLOADER LOGIC ---
+        // --- DEFINITIVE FINAL DOWNLOADER LOGIC ---
         function setupDownloader() {
             const downloadForm = document.getElementById('download-form');
             const urlInput = document.getElementById('video-url');
@@ -174,74 +174,76 @@
             const resultsErrorDiv = document.getElementById('results-error');
             const downloadLinksDiv = document.getElementById('download-links');
 
-            // List of reliable public APIs
-            const API_ENDPOINTS = [
-                'https://co.wuk.sh/api/json',
-                'https://api.cobalt.tools/api/json'
-            ];
+            // Using a reliable public API that is known to work with CORS
+            const API_ENDPOINT = 'https://invidious.io.lol/api/v1/videos/';
+
+            function getYouTubeVideoId(url) {
+                const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/;
+                return url.match(regex)?.[1] || null;
+            }
 
             downloadForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const videoUrl = urlInput.value.trim();
-                if (!videoUrl) { return showResultsError('Please enter a YouTube URL.'); }
+                const videoId = getYouTubeVideoId(urlInput.value.trim());
+                if (!videoId) { return showResultsError('Invalid YouTube URL. Please check the link and try again.'); }
                 
                 resetDownloaderUI();
                 setDownloaderLoading(true);
 
-                let success = false;
-                for (const endpoint of API_ENDPOINTS) {
-                    try {
-                        console.log(`Trying API: ${endpoint}`);
-                        const response = await fetch(endpoint, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                            },
-                            body: JSON.stringify({ url: videoUrl }),
-                        });
+                try {
+                    const fullApiUrl = `${API_ENDPOINT}${videoId}`;
+                    console.log(`Fetching from: ${fullApiUrl}`);
+                    
+                    const response = await fetch(fullApiUrl);
 
-                        if (!response.ok) {
-                            throw new Error(`Server returned HTTP ${response.status}`);
-                        }
-                        
-                        const result = await response.json();
-
-                        if (result.status === 'success' || result.status === 'stream') {
-                            displayDownloadOptions(result);
-                            success = true;
-                            break; 
-                        } else {
-                            throw new Error(result.text || 'API returned an error status.');
-                        }
-                    } catch (error) { 
-                        console.error(`Failed to fetch from ${endpoint}:`, error.message);
+                    if (!response.ok) {
+                        throw new Error(`The server responded with an error (Status: ${response.status}). The video may be private or deleted.`);
                     }
-                }
+                    
+                    const result = await response.json();
 
-                if (!success) {
-                    showResultsError('Could not fetch video. All servers are busy or the video is unavailable. Please try again later.');
+                    if (result && result.videoId) {
+                        displayDownloadOptions(result);
+                    } else {
+                        throw new Error('The API returned invalid data. The video may not be available.');
+                    }
+                } catch (error) { 
+                    console.error('Download Error:', error);
+                    showResultsError(error.message);
+                } finally {
+                    setDownloaderLoading(false);
                 }
-                setDownloaderLoading(false);
             });
 
             function displayDownloadOptions(data) {
                 const title = data.title || 'Untitled Video';
+                const formatStreams = Array.isArray(data.formatStreams) ? data.formatStreams : [];
+                const adaptiveFormats = Array.isArray(data.adaptiveFormats) ? data.adaptiveFormats : [];
+
                 let html = `<h3 class="text-2xl font-bold mb-4">${title}</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">`;
                 
                 let linksFound = false;
 
-                if (data.url) {
-                    html += createLinkHtml({ url: data.url, quality: 'Video', text: 'Download Video' });
+                const videoStreams = formatStreams
+                    .filter(f => f && f.url && f.container === 'mp4' && f.resolution)
+                    .sort((a,b) => parseInt(b.resolution) - parseInt(a.resolution));
+                
+                videoStreams.forEach(f => { 
+                    html += createLinkHtml({ url: f.url, quality: f.resolution, text: `Download Video` }); 
                     linksFound = true;
-                }
-                if (data.audio) {
-                    html += createLinkHtml({ url: data.audio, quality: 'Best Audio', text: 'Download Audio' });
-                    linksFound = true;
-                }
+                });
+                
+                const audioStreams = adaptiveFormats
+                    .filter(f => f && f.url && f.type && f.type.startsWith("audio/"))
+                    .sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0));
 
+                if (audioStreams.length > 0) { 
+                    html += createLinkHtml({ url: audioStreams[0].url, quality: 'Best Audio', text: `Download Audio` }); 
+                    linksFound = true;
+                }
+                
                 if (!linksFound) {
-                    showResultsError('No downloadable formats were found for this video.');
+                    showResultsError('No downloadable MP4 formats were found for this video.');
                     return;
                 }
 
@@ -259,5 +261,4 @@
         }
     </script>
 </body>
-    </html>
-    
+</html>

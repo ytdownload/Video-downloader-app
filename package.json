@@ -1,7 +1,7 @@
 {
-  "name": "rapidgrab-nodejs-final",
-  "version": "3.0.0",
-  "description": "Final Node.js backend for RapidGrab YouTube Downloader",
+  "name": "rapidgrab-proxy-backend",
+  "version": "1.0.0",
+  "description": "A proxy backend for the YouTube downloader",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -10,7 +10,6 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.19.2",
-    "play-dl": "^1.9.7"
+    "express": "^4.19.2"
   }
 }

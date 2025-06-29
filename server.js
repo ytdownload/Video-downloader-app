@@ -5,12 +5,18 @@
 const express = require('express');
 const ytdl = require('ytdl-core');
 const path = require('path');
+const cors = require('cors'); // <-- 1. IMPORT THE CORS PACKAGE
 
 // Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // --- Middleware ---
+
+// <-- 2. USE THE CORS MIDDLEWARE -->
+// This must be placed before your API routes. It allows all origins.
+app.use(cors()); 
+
 // Serve static files from the 'public' directory (for our HTML, CSS, JS)
 app.use(express.static(path.join(__dirname, 'public')));
 // Enable Express to parse JSON in request bodies

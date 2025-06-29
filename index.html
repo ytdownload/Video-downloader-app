@@ -165,7 +165,7 @@
             }
         }
 
-        // --- DEFINITIVE FINAL DOWNLOADER LOGIC ---
+        // --- DOWNLOADER LOGIC for yt-dlp Backend ---
         function setupDownloader() {
             const downloadForm = document.getElementById('download-form');
             const urlInput = document.getElementById('video-url');
@@ -174,18 +174,13 @@
             const resultsErrorDiv = document.getElementById('results-error');
             const downloadLinksDiv = document.getElementById('download-links');
 
-            // --- CRITICAL: This is the URL of YOUR backend on Render ---
-            const BACKEND_API_URL = 'https://video-downloader-app-dxwe.onrender.com';
-
-            function getYouTubeVideoId(url) {
-                const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/;
-                return url.match(regex)?.[1] || null;
-            }
+            // --- CRITICAL: This is the URL of YOUR yt-dlp backend on Render ---
+            const BACKEND_API_URL = 'https://your-yt-dlp-backend-name.onrender.com';
 
             downloadForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const videoId = getYouTubeVideoId(urlInput.value.trim());
-                if (!videoId) { return showResultsError('Invalid YouTube URL. Please check the link and try again.'); }
+                const videoUrl = urlInput.value.trim();
+                if (!videoUrl) { return showResultsError('Please enter a YouTube URL.'); }
                 
                 resetDownloaderUI();
                 setDownloaderLoading(true);
@@ -194,10 +189,8 @@
                     // Our frontend calls OUR backend
                     const response = await fetch(`${BACKEND_API_URL}/api/video-info`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ videoId: videoId }),
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ videoUrl: videoUrl }),
                     });
 
                     if (!response.ok) {
@@ -207,7 +200,7 @@
                     const result = await response.json();
 
                     if (result.success) {
-                        displayDownloadOptions(result.data);
+                        displayDownloadOptions(result.data, videoUrl);
                     } else {
                         throw new Error(result.error || 'The backend returned an unknown error.');
                     }
@@ -219,30 +212,42 @@
                 }
             });
 
-            function displayDownloadOptions(data) {
+            function displayDownloadOptions(data, originalUrl) {
                 const title = data.title || 'Untitled Video';
-                const formatStreams = Array.isArray(data.formatStreams) ? data.formatStreams : [];
-                const adaptiveFormats = Array.isArray(data.adaptiveFormats) ? data.adaptiveFormats : [];
+                const formats = Array.isArray(data.formats) ? data.formats : [];
 
                 let html = `<h3 class="text-2xl font-bold mb-4">${title}</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">`;
                 
                 let linksFound = false;
 
-                const videoStreams = formatStreams
-                    .filter(f => f && f.url && f.container === 'mp4' && f.resolution)
-                    .sort((a,b) => parseInt(b.resolution) - parseInt(a.resolution));
+                // Filter for useful video formats (mp4, with video and audio)
+                const videoFormats = formats
+                    .filter(f => f.vcodec !== 'none' && f.acodec !== 'none' && f.ext === 'mp4')
+                    .sort((a, b) => (b.height || 0) - (a.height || 0));
                 
-                videoStreams.forEach(f => { 
-                    html += createLinkHtml({ url: f.url, quality: f.resolution, text: `Download Video` }); 
+                videoFormats.forEach(f => {
+                    const quality = f.format_note || `${f.height}p`;
+                    html += createLinkHtml({ 
+                        videoUrl: originalUrl, 
+                        formatId: f.format_id, 
+                        quality: quality, 
+                        text: `Download Video` 
+                    });
                     linksFound = true;
                 });
                 
-                const audioStreams = adaptiveFormats
-                    .filter(f => f && f.url && f.type && f.type.startsWith("audio/"))
-                    .sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0));
+                // Find the best audio-only format
+                const audioFormats = formats
+                    .filter(f => f.vcodec === 'none' && f.acodec !== 'none')
+                    .sort((a, b) => (b.abr || 0) - (a.abr || 0));
 
-                if (audioStreams.length > 0) { 
-                    html += createLinkHtml({ url: audioStreams[0].url, quality: 'Best Audio', text: `Download Audio` }); 
+                if (audioFormats.length > 0) {
+                     html += createLinkHtml({ 
+                        videoUrl: originalUrl, 
+                        formatId: audioFormats[0].format_id, 
+                        quality: 'Best Audio', 
+                        text: `Download Audio` 
+                    });
                     linksFound = true;
                 }
                 
@@ -255,8 +260,10 @@
                 downloadLinksDiv.innerHTML = html;
             }
 
-            function createLinkHtml({ url, quality, text }) {
-                return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="block bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 transition-all text-center">${text}<span class="block text-sm font-normal opacity-80">${quality}</span></a>`;
+            function createLinkHtml({ videoUrl, formatId, quality, text }) {
+                // The link points to our own /api/download endpoint
+                const downloadUrl = `${BACKEND_API_URL}/api/download?videoUrl=${encodeURIComponent(videoUrl)}&formatId=${formatId}`;
+                return `<a href="${downloadUrl}" target="_blank" class="block bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 transition-all text-center">${text}<span class="block text-sm font-normal opacity-80">${quality}</span></a>`;
             }
 
             function showResultsError(message) { resultsErrorDiv.textContent = message; resultsErrorDiv.classList.remove('hidden'); }

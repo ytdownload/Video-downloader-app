@@ -1,13 +1,17 @@
 {
-  "name": "youtube-backend",
-  "version": "1.0.0",
+  "name": "rapidgrab-backend",
+  "version": "1.1.0",
+  "description": "Backend for RapidGrab YouTube Downloader",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2",
+    "@distube/ytdl-core": "^2.1.9",
     "cors": "^2.8.5",
-    "node-fetch": "^2.6.7"
+    "express": "^4.19.2"
   }
 }

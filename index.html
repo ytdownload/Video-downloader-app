@@ -75,7 +75,8 @@
         const downloadLinksDiv = document.getElementById('download-links');
         
         // --- !!! CRITICAL: UPDATE THIS URL !!! ---
-        const API_BASE_URL = 'https://your-app-name.onrender.com'; 
+        // Replace this with your Render.com backend URL
+        const API_BASE_URL = 'https://your-flask-app-name.onrender.com'; 
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault(); 
@@ -118,18 +119,15 @@
             let html = `<h3 class="col-span-full text-2xl font-bold mb-4">${title}</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">`;
 
             if (videoFormats && videoFormats.length > 0) {
-                videoFormats
-                    .sort((a,b) => parseInt(b.quality) - parseInt(a.quality))
-                    .forEach(format => {
-                        html += createLinkHtml({
-                            itag: format.itag,
-                            quality: format.quality,
-                            text: `Download Video`,
-                            videoUrl: originalUrl,
-                            title: title,
-                            container: format.container
-                        });
+                videoFormats.forEach(format => {
+                    html += createLinkHtml({
+                        itag: format.itag,
+                        quality: format.quality,
+                        text: `Download Video`,
+                        videoUrl: originalUrl,
+                        title: title,
                     });
+                });
             }
 
             if (bestAudio) {
@@ -139,7 +137,6 @@
                     text: `Download Audio`,
                     videoUrl: originalUrl,
                     title: title,
-                    container: bestAudio.container
                 });
             }
             
@@ -151,8 +148,8 @@
             }
         }
 
-        function createLinkHtml({ itag, quality, text, videoUrl, title, container }) {
-            const downloadUrl = `${API_BASE_URL}/api/download?videoUrl=${encodeURIComponent(videoUrl)}&itag=${itag}&title=${encodeURIComponent(title)}&container=${container}`;
+        function createLinkHtml({ itag, quality, text, videoUrl, title }) {
+            const downloadUrl = `${API_BASE_URL}/api/download?videoUrl=${encodeURIComponent(videoUrl)}&itag=${itag}&title=${encodeURIComponent(title)}`;
             return `
                 <a href="${downloadUrl}" class="block bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105 text-center">
                     ${text}

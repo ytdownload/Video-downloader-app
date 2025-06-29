@@ -100,9 +100,11 @@
             const auth = getAuth(app);
             const provider = new GoogleAuthProvider();
             setupAuthentication(auth, provider);
-            setupDownloader();
+            setupDownloader(); // This function contains the fix
         } catch (error) {
             console.error("FIREBASE INITIALIZATION FAILED:", error);
+            // Optionally, show an error to the user on the page
+            document.body.innerHTML = `<div style="padding: 2rem; text-align: center; color: red;">Failed to initialize the application. Please check the console.</div>`;
         }
 
         // --- Function to set up all authentication logic ---
@@ -165,7 +167,7 @@
             }
         }
 
-        // --- Function to set up all downloader logic ---
+        // --- FIXED: Function to set up all downloader logic ---
         function setupDownloader() {
             const downloadForm = document.getElementById('download-form');
             const urlInput = document.getElementById('video-url');
@@ -174,75 +176,71 @@
             const resultsErrorDiv = document.getElementById('results-error');
             const downloadLinksDiv = document.getElementById('download-links');
 
-            // Using a more stable primary API with fallbacks
-            const API_INSTANCES = [
-                'https://co.wuk.sh', // Primary API (Cobalt)
-                'https://vid.puffyan.us', // Fallback 1
-                'https://invidious.io.lol' // Fallback 2
-            ];
+            // --- THE FIX: Using a single, reliable API endpoint ---
+            const API_ENDPOINT = 'https://co.wuk.sh/api/json';
 
             downloadForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const videoUrl = urlInput.value.trim();
-                if (!videoUrl) { return showResultsError('Please enter a YouTube URL.'); }
+                if (!videoUrl) { 
+                    showResultsError('Please enter a YouTube URL.');
+                    return; 
+                }
                 
                 resetDownloaderUI();
                 setDownloaderLoading(true);
 
-                let success = false;
-                for (const instance of API_INSTANCES) {
-                    try {
-                        console.log(`Trying API: ${instance}`);
-                        const response = await fetch(`${instance}/api/json`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                            },
-                            body: JSON.stringify({ url: videoUrl, isAudioOnly: false }),
-                        });
+                try {
+                    const response = await fetch(API_ENDPOINT, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify({ url: videoUrl, isAudioOnly: false }),
+                    });
 
-                        if (!response.ok) {
-                            throw new Error(`API request failed with status ${response.status}`);
-                        }
-                        
-                        // --- ROBUST CHECK ---
-                        // Check if the response is actually JSON before trying to parse it
-                        const contentType = response.headers.get("content-type");
-                        if (contentType && contentType.indexOf("application/json") !== -1) {
-                            const result = await response.json();
-                            if (result.status === 'success' || result.status === 'stream') {
-                                displayDownloadOptions(result);
-                                success = true;
-                                break; // Success! Exit the loop.
-                            } else {
-                                // The API responded with JSON, but it was an error message
-                                throw new Error(result.text || 'API returned a non-success status.');
-                            }
-                        } else {
-                            // The response was not JSON (e.g., a plain text error page)
-                            throw new Error('API did not return a valid JSON response.');
-                        }
-                    } catch (error) { 
-                        console.error(`Error with ${instance}:`, error.message);
-                        // Let the loop continue to the next instance
+                    // Check for server errors (like 404, 500, etc.)
+                    if (!response.ok) {
+                        throw new Error(`The download service failed with status: ${response.status}`);
                     }
-                }
+                    
+                    // Check if the response is valid JSON to prevent crashes
+                    const contentType = response.headers.get("content-type");
+                    if (!contentType || !contentType.includes("application/json")) {
+                        throw new Error('Received an invalid (non-JSON) response from the server.');
+                    }
 
-                if (!success) { showResultsError('Could not fetch video. All servers may be busy or the video is unavailable.'); }
-                setDownloaderLoading(false);
+                    const result = await response.json();
+
+                    // Check for errors reported by the API itself
+                    if (result.status === 'success' || result.status === 'stream') {
+                        displayDownloadOptions(result);
+                    } else {
+                        throw new Error(result.text || 'An unknown API error occurred.');
+                    }
+                } catch (error) { 
+                    console.error('Download Error:', error);
+                    showResultsError(`Error: ${error.message}`);
+                } finally {
+                    setDownloaderLoading(false);
+                }
             });
 
             function displayDownloadOptions(data) {
                 const title = data.title || 'Untitled Video';
                 let html = `<h3 class="text-2xl font-bold mb-4">${title}</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">`;
                 
-                // Handle different response formats from different APIs
-                if (data.url) { // Single video stream (Cobalt)
-                    html += createLinkHtml({ url: data.url, quality: data.quality || 'Video', text: 'Download Video' });
+                if (data.url) { // Link for video
+                    html += createLinkHtml({ url: data.url, quality: 'Video', text: 'Download Video' });
                 }
-                if (data.audio) { // Cobalt audio stream
+                if (data.audio) { // Link for audio only
                     html += createLinkHtml({ url: data.audio, quality: 'Best Audio', text: 'Download Audio' });
+                }
+                // If neither link is available, show an error.
+                if (!data.url && !data.audio) {
+                    showResultsError("The API returned a success status but provided no download links.");
+                    return;
                 }
 
                 html += `</div>`;
@@ -253,9 +251,18 @@
                 return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="block bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 transition-all text-center">${text}<span class="block text-sm font-normal opacity-80">${quality}</span></a>`;
             }
 
-            function showResultsError(message) { resultsErrorDiv.textContent = message; resultsErrorDiv.classList.remove('hidden'); }
-            function resetDownloaderUI() { resultsErrorDiv.classList.add('hidden'); downloadLinksDiv.innerHTML = ''; }
-            function setDownloaderLoading(isLoading) { downloadBtn.disabled = isLoading; btnText.textContent = isLoading ? 'Fetching...' : 'Download'; }
+            function showResultsError(message) { 
+                resultsErrorDiv.textContent = message; 
+                resultsErrorDiv.classList.remove('hidden'); 
+            }
+            function resetDownloaderUI() { 
+                resultsErrorDiv.classList.add('hidden'); 
+                downloadLinksDiv.innerHTML = ''; 
+            }
+            function setDownloaderLoading(isLoading) { 
+                downloadBtn.disabled = isLoading; 
+                btnText.textContent = isLoading ? 'Fetching...' : 'Download'; 
+            }
         }
     </script>
 </body>

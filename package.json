@@ -1,29 +1,13 @@
 {
-  "name": "rapidgrab-youtube-downloader",
+  "name": "youtube-backend",
   "version": "1.0.0",
-  "description": "Backend for RapidGrab YouTube video downloader using Node.js and ytdl-core",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-  "keywords": [
-    "youtube",
-    "downloader",
-    "video",
-    "audio",
-    "ytdl-core",
-    "nodejs",
-    "express",
-    "api"
-  ],
-  "author": "Your Name",
-  "license": "MIT",
   "dependencies": {
-    "cors": "^2.8.5",
     "express": "^4.18.2",
-    "ytdl-core": "^4.11.2"
-  },
-  "engines": {
-    "node": ">=14"
+    "cors": "^2.8.5",
+    "node-fetch": "^2.6.7"
   }
 }

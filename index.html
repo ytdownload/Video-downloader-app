@@ -102,7 +102,8 @@
             try {
                 // *** THIS IS THE KEY CHANGE ***
                 // Fetch data from our Node.js server's API endpoint
-                const response = await fetch(`/video-info?videoURL=${encodeURIComponent(videoURL)}`);
+                const liveServerURL = 'https://video-downloader-app-97zm.onrender.com'; // <-- PASTE YOUR RENDER URL HERE
+const response = await fetch(`${liveServerURL}/video-info?videoURL=${encodeURIComponent(videoURL)}`);
                 const data = await response.json();
 
                 if (!data.success) {

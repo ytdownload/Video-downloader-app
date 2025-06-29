@@ -12,7 +12,6 @@
         body { font-family: 'Inter', sans-serif; background-color: #f0f2f5; }
         .spinner { border: 4px solid rgba(0, 0, 0, 0.1); width: 24px; height: 24px; border-radius: 50%; border-left-color: #fff; animation: spin 1s ease infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        /* Hide elements by default */
         .hidden { display: none; }
     </style>
 </head>
@@ -22,10 +21,9 @@
     <header class="bg-white shadow-md">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <h1 class="text-2xl font-bold text-blue-600">RapidGrab</h1>
-            <!-- User Info / Sign Out Button (hidden by default) -->
             <div id="user-info" class="hidden items-center">
                 <span id="user-email" class="text-gray-600 mr-4"></span>
-                <button id="sign-out-btn" class="bg-red-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-600 transition-all">Sign Out</button>
+                <button id="sign-out-btn" class="bg-red-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-600">Sign Out</button>
             </div>
         </div>
     </header>
@@ -33,7 +31,7 @@
     <!-- Main Content Area -->
     <main class="container mx-auto px-6 py-12">
 
-        <!-- Login Form (Visible by default) -->
+        <!-- Login Form -->
         <div id="login-section" class="max-w-md mx-auto">
             <div class="bg-white p-8 rounded-xl shadow-lg text-center">
                 <h2 class="text-2xl font-bold mb-6">Sign In / Sign Up</h2>
@@ -45,16 +43,14 @@
                     <div class="mb-6">
                         <input type="password" id="password-input" placeholder="Password (6+ characters)" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
-                    <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition-all">
+                    <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700">
                         Sign In / Sign Up
                     </button>
                 </form>
                 <div class="my-6 flex items-center">
-                    <hr class="flex-grow border-t border-gray-300">
-                    <span class="px-4 text-gray-500">OR</span>
-                    <hr class="flex-grow border-t border-gray-300">
+                    <hr class="flex-grow border-t border-gray-300"><span class="px-4 text-gray-500">OR</span><hr class="flex-grow border-t border-gray-300">
                 </div>
-                <button id="google-signin-btn" class="w-full bg-white border-2 border-gray-300 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-100 transition-all flex items-center justify-center">
+                <button id="google-signin-btn" class="w-full bg-white border-2 border-gray-300 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-100 flex items-center justify-center">
                     <svg class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"/><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.012 36.49 44 30.863 44 24c0-1.341-.138-2.65-.389-3.917z"/></svg>
                     Sign In with Google
                 </button>
@@ -65,7 +61,6 @@
         <div id="downloader-section" class="hidden max-w-3xl mx-auto text-center">
             <h2 class="text-3xl md:text-4xl font-bold mb-2">YouTube Video Downloader</h2>
             <p class="text-gray-600 mb-8">Paste a YouTube video URL below to download it.</p>
-
             <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
                 <form id="download-form" class="flex flex-col sm:flex-row gap-4">
                     <input type="text" id="video-url" placeholder="https://www.youtube.com/watch?v=..." class="flex-grow w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
@@ -75,7 +70,6 @@
                     </button>
                 </form>
             </div>
-
             <div id="results-section" class="mt-8 text-left">
                 <div id="results-error" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg" role="alert"></div>
                 <div id="download-links"></div>
@@ -86,174 +80,169 @@
 
     <!-- Firebase SDK -->
     <script type="module">
-        // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { 
-            getAuth, 
-            onAuthStateChanged,
-            createUserWithEmailAndPassword,
-            signInWithEmailAndPassword,
-            signInWithPopup,
-            GoogleAuthProvider,
-            signOut
-        } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 
-        // --- 1. PASTE YOUR FIREBASE CONFIGURATION HERE ---
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyCvIyq7hnhwZWzUg0M8TkV378_XaecMoGI",
-  authDomain: "rapid-e9181.firebaseapp.com",
-  projectId: "rapid-e9181",
-  storageBucket: "rapid-e9181.firebasestorage.app",
-  messagingSenderId: "929215257715",
-  appId: "1:929215257715:web:1f3b2aa9b8a2cf2b3fde06",
-  measurementId: "G-2WNFZXMCTV"
-};
+        // --- Your Real Firebase Configuration ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCvIyq7hnhwZWzUg0M8TkV378_XaecMoGI",
+            authDomain: "rapid-e9181.firebaseapp.com",
+            projectId: "rapid-e9181",
+            storageBucket: "rapid-e9181.appspot.com",
+            messagingSenderId: "929215257715",
+            appId: "1:929215257715:web:1f3b2aa9b8a2cf2b3fde06",
+            measurementId: "G-2WNFZXMCTV"
+        };
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
+        // --- Initialize Firebase and Attach All Logic ---
+        try {
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const provider = new GoogleAuthProvider();
 
-        // --- DOM Elements ---
-        const loginSection = document.getElementById('login-section');
-        const downloaderSection = document.getElementById('downloader-section');
-        const userInfo = document.getElementById('user-info');
-        const userEmailSpan = document.getElementById('user-email');
-        const signOutBtn = document.getElementById('sign-out-btn');
-        const emailPasswordForm = document.getElementById('email-password-form');
-        const emailInput = document.getElementById('email-input');
-        const passwordInput = document.getElementById('password-input');
-        const googleSignInBtn = document.getElementById('google-signin-btn');
-        const authErrorDiv = document.getElementById('auth-error');
-        
-        // --- Core Authentication Logic ---
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // User is signed in
-                loginSection.classList.add('hidden');
-                downloaderSection.classList.remove('hidden');
-                userInfo.classList.remove('hidden');
-                userInfo.classList.add('flex');
-                userEmailSpan.textContent = user.email;
-            } else {
-                // User is signed out
-                loginSection.classList.remove('hidden');
-                downloaderSection.classList.add('hidden');
-                userInfo.classList.add('hidden');
-                userInfo.classList.remove('flex');
-                userEmailSpan.textContent = '';
-            }
-        });
+            setupAuthentication(auth, provider);
+            setupDownloader();
 
-        // --- Event Listeners for Authentication ---
-        emailPasswordForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = emailInput.value;
-            const password = passwordInput.value;
-            showAuthError(''); // Clear previous errors
+        } catch (error) {
+            console.error("FIREBASE INITIALIZATION FAILED:", error);
+            const debugStatus = document.getElementById('debug-status');
+            debugStatus.classList.remove('hidden');
+            debugStatus.innerHTML = `<strong>Firebase Connection FAILED.</strong><br><em>${error.message}</em>`;
+            debugStatus.style.backgroundColor = '#fee2e2';
+            debugStatus.style.color = '#991b1b';
+            document.getElementById('login-section').style.display = 'none';
+        }
 
-            try {
-                // Try to sign in first
-                await signInWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                // If sign in fails, it might be a new user, so try to sign them up
-                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                    try {
-                        await createUserWithEmailAndPassword(auth, email, password);
-                    } catch (signupError) {
-                        showAuthError(signupError.message);
-                    }
+        // --- Function to set up all authentication logic ---
+        function setupAuthentication(auth, provider) {
+            const loginSection = document.getElementById('login-section');
+            const downloaderSection = document.getElementById('downloader-section');
+            const userInfo = document.getElementById('user-info');
+            const userEmailSpan = document.getElementById('user-email');
+            const signOutBtn = document.getElementById('sign-out-btn');
+            const emailPasswordForm = document.getElementById('email-password-form');
+            const emailInput = document.getElementById('email-input');
+            const passwordInput = document.getElementById('password-input');
+            const googleSignInBtn = document.getElementById('google-signin-btn');
+            const authErrorDiv = document.getElementById('auth-error');
+
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    loginSection.classList.add('hidden');
+                    downloaderSection.classList.remove('hidden');
+                    userInfo.classList.remove('hidden');
+                    userInfo.classList.add('flex');
+                    userEmailSpan.textContent = user.email;
                 } else {
-                    showAuthError(error.message);
+                    loginSection.classList.remove('hidden');
+                    downloaderSection.classList.add('hidden');
+                    userInfo.classList.add('hidden');
+                    userInfo.classList.remove('flex');
                 }
-            }
-        });
+            });
 
-        googleSignInBtn.addEventListener('click', () => {
-            signInWithPopup(auth, provider).catch(error => showAuthError(error.message));
-        });
+            emailPasswordForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = emailInput.value;
+                const password = passwordInput.value;
+                showAuthError('');
 
-        signOutBtn.addEventListener('click', () => {
-            signOut(auth).catch(error => showAuthError(error.message));
-        });
-
-        function showAuthError(message) {
-            if (message) {
-                authErrorDiv.textContent = message.replace('Firebase: ', '');
-                authErrorDiv.classList.remove('hidden');
-            } else {
-                authErrorDiv.classList.add('hidden');
-            }
-        }
-
-        // --- Downloader Logic (from previous version) ---
-        const downloadForm = document.getElementById('download-form');
-        const urlInput = document.getElementById('video-url');
-        const downloadBtn = document.getElementById('download-btn');
-        const btnIcon = document.getElementById('btn-icon');
-        const btnText = document.getElementById('btn-text');
-        const resultsErrorDiv = document.getElementById('results-error');
-        const downloadLinksDiv = document.getElementById('download-links');
-
-        const INVIDIOUS_INSTANCES = [
-            'https://vid.puffyan.us', 'https://invidious.io.lol', 'https://inv.hnh.is',
-        ];
-
-        function getYouTubeVideoId(url) {
-            const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/;
-            const match = url.match(regex);
-            return match ? match[1] : null;
-        }
-
-        downloadForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const videoUrl = urlInput.value.trim();
-            const videoId = getYouTubeVideoId(videoUrl);
-
-            if (!videoId) { return showResultsError('Invalid YouTube URL.'); }
-            
-            resetDownloaderUI();
-            setDownloaderLoading(true);
-
-            let success = false;
-            for (const instance of INVIDIOUS_INSTANCES) {
                 try {
-                    const apiUrl = `${instance}/api/v1/videos/${videoId}`;
-                    const response = await fetch(apiUrl);
-                    if (!response.ok) throw new Error('API request failed');
-                    const result = await response.json();
-                    displayDownloadOptions(result);
-                    success = true;
-                    break;
+                    await signInWithEmailAndPassword(auth, email, password);
                 } catch (error) {
-                    console.error(`Error with ${instance}:`, error);
+                    // --- THE FIX IS HERE ---
+                    // If sign in fails, check for specific errors to decide if we should create a new account.
+                    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-login-credentials') {
+                        try {
+                            // If the user doesn't exist, create a new account for them.
+                            await createUserWithEmailAndPassword(auth, email, password);
+                        } catch (signupError) { 
+                            // Show any errors that happen during signup (e.g., weak password)
+                            showAuthError(signupError.message); 
+                        }
+                    } else {
+                        // For all other errors, just show the message.
+                        showAuthError(error.message);
+                    }
                 }
+            });
+
+            googleSignInBtn.addEventListener('click', () => {
+                signInWithPopup(auth, provider).catch(error => showAuthError(error.message));
+            });
+
+            signOutBtn.addEventListener('click', () => {
+                signOut(auth).catch(error => showAuthError(error.message));
+            });
+
+            function showAuthError(message) {
+                if (message) {
+                    authErrorDiv.textContent = message.replace('Firebase: ', '').replace('Firebase: Error ', '');
+                    authErrorDiv.classList.remove('hidden');
+                } else { authErrorDiv.classList.add('hidden'); }
+            }
+        }
+
+        // --- Function to set up all downloader logic ---
+        function setupDownloader() {
+            const downloadForm = document.getElementById('download-form');
+            const urlInput = document.getElementById('video-url');
+            const downloadBtn = document.getElementById('download-btn');
+            const btnText = document.getElementById('btn-text');
+            const resultsErrorDiv = document.getElementById('results-error');
+            const downloadLinksDiv = document.getElementById('download-links');
+
+            const INVIDIOUS_INSTANCES = ['https://vid.puffyan.us', 'https://invidious.io.lol', 'https://inv.hnh.is'];
+
+            function getYouTubeVideoId(url) {
+                const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/;
+                return url.match(regex)?.[1] || null;
             }
 
-            if (!success) { showResultsError('Could not fetch video. Servers may be busy or the video is unavailable.'); }
-            setDownloaderLoading(false);
-        });
+            downloadForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const videoId = getYouTubeVideoId(urlInput.value.trim());
+                if (!videoId) { return showResultsError('Invalid YouTube URL.'); }
+                
+                resetDownloaderUI();
+                setDownloaderLoading(true);
 
-        function displayDownloadOptions(data) {
-            const { title, formatStreams, adaptiveFormats } = data;
-            let html = `<h3 class="text-2xl font-bold mb-4">${title}</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">`;
-            const videoStreams = formatStreams.filter(f => f.container === 'mp4' && f.resolution).sort((a,b) => parseInt(b.resolution) - parseInt(a.resolution));
-            videoStreams.forEach(f => { html += createLinkHtml({ url: f.url, quality: f.resolution, text: `Download Video` }); });
-            const audioStreams = adaptiveFormats.filter(f => f.type.startsWith("audio/")).sort((a, b) => b.bitrate - a.bitrate);
-            if (audioStreams.length > 0) { html += createLinkHtml({ url: audioStreams[0].url, quality: 'Best Audio', text: `Download Audio` }); }
-            html += `</div>`;
-            downloadLinksDiv.innerHTML = html;
+                let success = false;
+                for (const instance of INVIDIOUS_INSTANCES) {
+                    try {
+                        const response = await fetch(`${instance}/api/v1/videos/${videoId}`);
+                        if (!response.ok) throw new Error('API request failed');
+                        const result = await response.json();
+                        displayDownloadOptions(result);
+                        success = true;
+                        break;
+                    } catch (error) { console.error(`Error with ${instance}:`, error); }
+                }
+
+                if (!success) { showResultsError('Could not fetch video. Servers may be busy or the video is unavailable.'); }
+                setDownloaderLoading(false);
+            });
+
+            function displayDownloadOptions(data) {
+                const { title, formatStreams, adaptiveFormats } = data;
+                let html = `<h3 class="text-2xl font-bold mb-4">${title}</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">`;
+                const videoStreams = formatStreams.filter(f => f.container === 'mp4' && f.resolution).sort((a,b) => parseInt(b.resolution) - parseInt(a.resolution));
+                videoStreams.forEach(f => { html += createLinkHtml({ url: f.url, quality: f.resolution, text: `Download Video` }); });
+                const audioStreams = adaptiveFormats.filter(f => f.type.startsWith("audio/")).sort((a, b) => b.bitrate - a.bitrate);
+                if (audioStreams.length > 0) { html += createLinkHtml({ url: audioStreams[0].url, quality: 'Best Audio', text: `Download Audio` }); }
+                html += `</div>`;
+                downloadLinksDiv.innerHTML = html;
+            }
+
+            function createLinkHtml({ url, quality, text }) {
+                return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="block bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 transition-all text-center">${text}<span class="block text-sm font-normal opacity-80">${quality}</span></a>`;
+            }
+
+            function showResultsError(message) { resultsErrorDiv.textContent = message; resultsErrorDiv.classList.remove('hidden'); }
+            function resetDownloaderUI() { resultsErrorDiv.classList.add('hidden'); downloadLinksDiv.innerHTML = ''; }
+            function setDownloaderLoading(isLoading) { downloadBtn.disabled = isLoading; btnText.textContent = isLoading ? 'Fetching...' : 'Download'; }
         }
-
-        function createLinkHtml({ url, quality, text }) {
-            return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="block bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 transition-all text-center">${text}<span class="block text-sm font-normal opacity-80">${quality}</span></a>`;
-        }
-
-        function showResultsError(message) { resultsErrorDiv.textContent = message; resultsErrorDiv.classList.remove('hidden'); }
-        function resetDownloaderUI() { resultsErrorDiv.classList.add('hidden'); downloadLinksDiv.innerHTML = ''; }
-        function setDownloaderLoading(isLoading) { downloadBtn.disabled = isLoading; btnText.textContent = isLoading ? 'Fetching...' : 'Download'; }
-
     </script>
 </body>
-</html>
+    </html>
+    

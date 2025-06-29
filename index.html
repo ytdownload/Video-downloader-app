@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Video Downloader - Download Videos Fast and Free</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* bg-gray-900 */
+        }
+
+        /* Custom focus ring for better accessibility and style */
+        .focus-ring:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+            --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color, rgba(96, 165, 250, 1));
+            box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+        }
+
+        /* Fade-in animation for content */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="text-gray-200">
+
+    <!-- Header -->
+    <header class="bg-gray-800/70 backdrop-blur-lg sticky top-0 z-50 border-b border-gray-700/50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#home" class="text-2xl font-bold text-white">ProDownloader</a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#home" class="text-gray-300 hover:text-blue-400 transition-colors">Home</a>
+                <a href="#features" class="text-gray-300 hover:text-blue-400 transition-colors">Features</a>
+                <a href="#about" class="text-gray-300 hover:text-blue-400 transition-colors">About</a>
+            </div>
+             <button id="mobile-menu-button" class="md:hidden text-white focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden">
+            <a href="#home" class="block py-2 px-6 text-gray-300 hover:bg-gray-700">Home</a>
+            <a href="#features" class="block py-2 px-6 text-gray-300 hover:bg-gray-700">Features</a>
+            <a href="#about" class="block py-2 px-6 text-gray-300 hover:bg-gray-700">About</a>
+        </div>
+    </header>
+
+    <main>
+        
+        <!-- Home Section (Video Downloader) -->
+        <section id="home" class="py-16 md:py-24">
+            <div class="container mx-auto px-4">
+                <div class="w-full max-w-3xl mx-auto">
+                    <div class="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl shadow-2xl overflow-hidden">
+                        <div class="p-6 md:p-8">
+                            <div class="text-center mb-8">
+                                <h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tight">The Ultimate Video Downloader</h1>
+                                <p class="text-gray-400 mt-3 text-lg">Paste any video link to see a demonstration.</p>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="relative flex items-center">
+                                    <svg class="absolute left-4 w-6 h-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                                    <input type="url" id="videoUrl" placeholder="https://..." class="w-full bg-gray-900 text-white placeholder-gray-500 pl-12 pr-4 py-3 rounded-xl border-2 border-gray-700 focus:outline-none focus:border-blue-500 transition-colors focus-ring">
+                                </div>
+                                <button id="getLinksBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg py-3 px-6 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] focus-ring flex items-center justify-center gap-2">
+                                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                    Run Demonstration
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Results Area -->
+                        <div id="results" class="px-6 md:px-8 pb-8 mt-2">
+                             <!-- This div will now show the explanation message -->
+                            <div id="demoMessage" class="hidden"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="py-16 md:py-24 bg-gray-900">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-4xl font-extrabold text-white mb-4">Features</h2>
+                <p class="text-lg text-gray-400 mb-12 max-w-2xl mx-auto">Everything you need in a modern video downloader.</p>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-gray-800 p-8 rounded-2xl border border-gray-700/50 fade-in">
+                        <div class="bg-blue-600 text-white rounded-full p-3 w-12 h-12 inline-flex items-center justify-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></div>
+                        <h3 class="text-2xl font-bold text-white mb-2">High Quality</h3>
+                        <p class="text-gray-400">Our interface is designed to handle downloads in stunning quality, up to 4K resolution.</p>
+                    </div>
+                    <div class="bg-gray-800 p-8 rounded-2xl border border-gray-700/50 fade-in" style="animation-delay: 0.2s;">
+                        <div class="bg-blue-600 text-white rounded-full p-3 w-12 h-12 inline-flex items-center justify-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg></div>
+                        <h3 class="text-2xl font-bold text-white mb-2">Multiple Formats</h3>
+                        <p class="text-gray-400">Choose from a wide range of video (MP4, WebM) and audio-only (MP3, M4A) formats.</p>
+                    </div>
+                    <div class="bg-gray-800 p-8 rounded-2xl border border-gray-700/50 fade-in" style="animation-delay: 0.4s;">
+                        <div class="bg-blue-600 text-white rounded-full p-3 w-12 h-12 inline-flex items-center justify-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg></div>
+                        <h3 class="text-2xl font-bold text-white mb-2">Clean & Fast UI</h3>
+                        <p class="text-gray-400">A user interface that is optimized to be fast, responsive, and easy to use on any device.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Us Section -->
+        <section id="about" class="py-16 md:py-24">
+            <div class="container mx-auto px-4 max-w-3xl text-lg">
+                <h2 class="text-4xl font-extrabold text-white mb-4 text-center">About This Project</h2>
+                <div class="bg-gray-800/50 p-8 rounded-2xl border border-gray-700/50">
+                    <p class="text-gray-300 mb-6">
+                        This website is a high-fidelity demonstration of what a modern, user-focused downloader interface can look like. It was created to showcase a clean, responsive design without the clunky software or intrusive ads often found on other sites.
+                    </p>
+                    <p class="text-gray-300 mb-6">
+                        <strong class="text-white">It is important to understand that this is a front-end UI demonstration only.</strong> For security and legal reasons, the code you see here cannot actually download videos from YouTube or other services. The download functionality is simulated to show you how the interface would work.
+                    </p>
+                    <p class="text-gray-300">
+                        Our philosophy is to prioritize user experience. That means a clean design, no pop-ups, and no confusing steps. We believe in building tools that respect the user, and we encourage the responsible use of any technology in compliance with copyright laws and platform terms of service.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800">
+        <div class="container mx-auto px-6 py-8">
+            <div class="text-center text-gray-500 text-sm">
+                <p>&copy; 2025 ProDownloader. This is a user interface demonstration.</p>
+                <p class="mt-2">Please respect copyright laws and the terms of service of all video platforms.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- Mobile Menu Toggle ---
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navLinks = mobileMenu.querySelectorAll('a');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Close mobile menu when a link is clicked
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // --- Downloader UI Logic ---
+        const getLinksBtn = document.getElementById('getLinksBtn');
+        const videoUrlInput = document.getElementById('videoUrl');
+        const demoMessageDiv = document.getElementById('demoMessage');
+
+        getLinksBtn.addEventListener('click', handleGetLinks);
+        videoUrlInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleGetLinks(); });
+
+        function handleGetLinks() {
+            const videoUrl = videoUrlInput.value.trim();
+            
+            // Clear previous message
+            demoMessageDiv.classList.add('hidden');
+            demoMessageDiv.innerHTML = '';
+
+            if (!isValidUrl(videoUrl)) {
+                showDemoMessage('Please enter a valid URL to run the demonstration.', 'error');
+                return;
+            }
+
+            // Show the explanation message
+            const message = `
+                <h3 class="font-bold text-lg text-white">Demonstration Running</h3>
+                <p class="mt-2 text-gray-300">Thank you for trying the demo! If this were a real application, it would now contact a server to get download links for the URL you provided.</p>
+                <p class="mt-4 text-sm text-yellow-200 bg-yellow-900/50 p-3 rounded-lg">
+                    <strong>Important:</strong> This front-end website cannot download videos from YouTube due to browser security and platform terms of service. A complex back-end server is required for such functionality. This UI is for demonstration purposes only.
+                </p>
+            `;
+            showDemoMessage(message, 'success');
+        }
+
+        function showDemoMessage(htmlContent, type) {
+            const colorClass = type === 'error' 
+                ? 'bg-red-500/10 border border-red-500/30' 
+                : 'bg-blue-500/10 border border-blue-500/30';
+            
+            demoMessageDiv.innerHTML = `<div class="p-4 rounded-xl ${colorClass}">${htmlContent}</div>`;
+            demoMessageDiv.classList.remove('hidden');
+            demoMessageDiv.classList.add('fade-in');
+        }
+
+        function isValidUrl(string) {
+            try {
+                const url = new URL(string);
+                return url.protocol === "http:" || url.protocol === "https:";
+            } catch (_) { return false; }
+        }
+    </script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 {
   "name": "rapidgrab-yt-dlp-backend",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A backend API using the yt-dlp command-line tool.",
   "main": "server.js",
   "scripts": {
@@ -17,10 +17,8 @@
 }
 ```
 
-**Note the `"postinstall": "yt-dlp-wrap --download"` line.** This is a special script that tells Render to download the latest version of `yt-dlp` right after it installs the other packages.
-
-#### `server.js` (The `yt-dlp` API Logic)
-This is the heart of your new API. It receives requests from your frontend, runs the powerful `yt-dlp` command on the server, and sends the results back.
+#### 2. `server.js` (The `yt-dlp` API Logic)
+This code is correct and works with the `package.json` above. It runs the powerful `yt-dlp` command on the server.
 
 
 ```javascript
@@ -29,17 +27,20 @@ This is the heart of your new API. It receives requests from your frontend, runs
 const express = require('express');
 const cors = require('cors');
 const YTDlpWrap = require('yt-dlp-wrap').default;
-const path = require('path');
 
 // --- Initialize App and yt-dlp ---
 const app = express();
 const PORT = process.env.PORT || 4000;
-// This creates a new instance of the yt-dlp wrapper
 const ytDlpWrap = new YTDlpWrap();
 
 // --- Middleware ---
 app.use(cors());
 app.use(express.json());
+
+// --- A simple status check endpoint ---
+app.get('/', (req, res) => {
+    res.json({ status: 'ok', message: 'yt-dlp backend is running.' });
+});
 
 // --- API Endpoint to Get Video Info ---
 app.post('/api/video-info', async (req, res) => {
@@ -59,7 +60,7 @@ app.post('/api/video-info', async (req, res) => {
         res.json({ success: true, data: metadata });
 
     } catch (error) {
-        console.error('Error fetching video info with yt-dlp:', error);
+        console.error('Error fetching video info with yt-dlp:', error.message);
         res.status(500).json({ success: false, error: 'Failed to fetch video information. The URL may be invalid or the video is private.' });
     }
 });
@@ -86,7 +87,7 @@ app.get('/api/download', async (req, res) => {
         res.redirect(downloadUrl);
 
     } catch (error) {
-        console.error('Error getting download URL:', error);
+        console.error('Error getting download URL:', error.message);
         res.status(500).send('An error occurred while preparing the download link.');
     }
 });

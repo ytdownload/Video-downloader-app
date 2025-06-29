@@ -2,8 +2,8 @@
 
 const express = require('express');
 const cors = require('cors');
-// We don't need a special library, we can use Node's built-in fetch
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+// Use require() which is more standard for this type of project
+const fetch = require('node-fetch');
 
 const app = express();
 const PORT = process.env.PORT || 4000;

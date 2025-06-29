@@ -1,5 +1,0 @@
-Flask==2.3.3
-Flask-Cors==4.0.0
-pytube==15.0.0
-gunicorn==21.2.0
-Werkzeug==2.3.8

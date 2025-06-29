@@ -3,21 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Video Downloader</title>
+    <title>RapidGrab | YouTube Video Downloader</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom Styles -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
         }
-        .loader {
-            border-top-color: #3498db;
-            -webkit-animation: spin 1s linear infinite;
-            animation: spin 1s linear infinite;
-        }
-        @-webkit-keyframes spin {
-            0% { -webkit-transform: rotate(0deg); }
-            100% { -webkit-transform: rotate(360deg); }
+        /* Simple spinner animation */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #09f;
+            animation: spin 1s ease infinite;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -25,224 +31,293 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+<body class="bg-gray-100 text-gray-800">
 
-    <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl">
-        
-        <!-- Header -->
-        <header class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-800 dark:text-white">YouTube Downloader</h1>
-            <p class="text-md sm:text-lg text-gray-600 dark:text-gray-400 mt-2">Paste a YouTube video URL below to get download links.</p>
-        </header>
+    <!-- Header -->
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-blue-600">RapidGrab</h1>
+            <nav>
+                <a href="#downloader" class="text-gray-600 hover:text-blue-600 px-3 py-2">Downloader</a>
+                <a href="#features" class="text-gray-600 hover:text-blue-600 px-3 py-2">Features</a>
+                <a href="#about" class="text-gray-600 hover:text-blue-600 px-3 py-2">About</a>
+            </nav>
+        </div>
+    </header>
 
-        <!-- Main Content -->
-        <main>
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 sm:p-8">
-                <!-- Input Form -->
-                <form id="download-form" class="flex flex-col sm:flex-row items-center gap-4">
-                    <div class="relative flex-grow w-full">
-                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"></path></svg>
-                        <input type="text" id="video-url" placeholder="https://www.youtube.com/watch?v=..." class="w-full pl-12 pr-4 py-3 bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:border-blue-500 focus:ring-0 rounded-xl transition duration-300" required>
-                    </div>
-                    <button type="submit" id="submit-button" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-xl shadow-md hover:shadow-lg transition duration-300 flex items-center justify-center">
-                        <span id="button-text">Get Links</span>
-                        <div id="loader" class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-6 w-6 ml-3 hidden"></div>
+    <!-- Main Content -->
+    <main id="downloader" class="container mx-auto px-6 py-12 md:py-20">
+        <div class="max-w-3xl mx-auto text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-2">YouTube Video Downloader</h2>
+            <p class="text-gray-600 mb-8">Paste a YouTube video URL below to download it in various formats.</p>
+
+            <!-- Downloader Form -->
+            <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
+                <form id="download-form" class="flex flex-col sm:flex-row gap-4">
+                    <input 
+                        type="text" 
+                        id="video-url"
+                        placeholder="https://www.youtube.com/watch?v=..."
+                        class="flex-grow w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                        required
+                    >
+                    <button 
+                        type="submit"
+                        id="download-btn"
+                        class="bg-blue-600 text-white font-semibold px-8 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="mr-2" viewBox="0 0 16 16">
+                          <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                          <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                        </svg>
+                        <span>Download</span>
                     </button>
                 </form>
-
-                <!-- Error Message -->
-                <div id="error-message" class="hidden mt-6 p-4 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 rounded-lg">
-                    <p><strong>Error:</strong> <span id="error-text"></span></p>
-                </div>
             </div>
 
             <!-- Results Section -->
-            <div id="results-container" class="mt-8 hidden">
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 sm:p-8">
-                    <div class="flex flex-col md:flex-row items-center gap-6">
-                        <img id="thumbnail" src="https://placehold.co/320x180/e2e8f0/4a5568?text=Thumbnail" alt="Video Thumbnail" class="w-full md:w-1/3 rounded-lg shadow-md">
-                        <div class="flex-grow">
-                            <h2 id="video-title" class="text-xl font-bold text-gray-800 dark:text-white">Video Title Goes Here</h2>
-                            <p id="video-author" class="text-gray-600 dark:text-gray-400 mt-1">by Author</p>
-                        </div>
+            <div id="results-section" class="mt-8">
+                <!-- Spinner/Loading Indicator -->
+                <div id="loading" class="hidden flex justify-center items-center flex-col">
+                    <div class="spinner"></div>
+                    <p class="mt-4 text-gray-600">Fetching download links...</p>
+                </div>
+                <!-- Error Messages -->
+                <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg" role="alert"></div>
+                <!-- Download Links -->
+                <div id="download-links" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Features Section -->
+    <section id="features" class="bg-white py-16 md:py-24">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-3xl font-bold mb-4">Features</h2>
+                <p class="text-gray-600 mb-10">Everything you need in a modern video downloader.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8 text-center">
+                <div class="p-6">
+                    <div class="flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white mx-auto mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v13A1.5 1.5 0 0 0 1.5 16h13a1.5 1.5 0 0 0 1.5-1.5v-13A1.5 1.5 0 0 0 14.5 0h-13zM8 8a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
                     </div>
-                    <div id="download-links" class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <!-- Download links will be inserted here -->
+                    <h3 class="text-xl font-semibold mb-2">Multiple Formats</h3>
+                    <p class="text-gray-600">Download videos in MP4, WEBM, and as audio-only MP3 files.</p>
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white mx-auto mb-4">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M11.536 6.012a.5.5 0 0 1 .707 0l2.121 2.121a.5.5 0 0 1 0 .707L11.536 10.96a.5.5 0 0 1-.707-.707L12.646 8.5H3.5a.5.5 0 0 1 0-1h9.146L11.536 6.012a.5.5 0 0 1 0-.707z"/><path d="M1.5 2.5A1.5 1.5 0 0 1 3 1h10a1.5 1.5 0 0 1 1.5 1.5v11A1.5 1.5 0 0 1 13 15H3a1.5 1.5 0 0 1-1.5-1.5v-11zM3 2a.5.5 0 0 0-.5.5v11a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5v-11a.5.5 0 0 0-.5-.5H3z"/></svg>
                     </div>
+                    <h3 class="text-xl font-semibold mb-2">High Quality</h3>
+                    <p class="text-gray-600">Get the best available quality for your downloads, including 720p, 1080p, and more.</p>
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white mx-auto mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Secure & Private</h3>
+                    <p class="text-gray-600">Your downloads are processed securely. We don't store your video URLs or files.</p>
                 </div>
             </div>
-        </main>
+        </div>
+    </section>
 
-        <!-- Footer -->
-        <footer class="text-center mt-12 text-sm text-gray-500 dark:text-gray-400">
-            <p>Disclaimer: This tool is for personal use only. Please respect the copyright of the content creators.</p>
-            <p class="mt-1">Powered by <a href="https://co.wuk.sh/" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">Cobalt</a> API.</p>
-        </footer>
+    <!-- About Us Section -->
+    <section id="about" class="bg-gray-100 py-16 md:py-24">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto text-center">
+                 <h2 class="text-3xl font-bold mb-4">About Us</h2>
+                 <p class="text-gray-600 leading-relaxed">
+                    RapidGrab was created to provide a simple, fast, and reliable way to download YouTube videos for offline viewing. We believe in open access to content and built this tool to be free and easy for everyone to use. Our service is powered by the excellent <a href="https://cobalt.tools/" target="_blank" rel="noopener" class="text-blue-600 hover:underline">Cobalt API</a>, ensuring stable and versatile download options. We are committed to maintaining a user-friendly and ad-free experience.
+                 </p>
+            </div>
+        </div>
+    </section>
 
-    </div>
+    <!-- Footer -->
+    <footer class="bg-white">
+        <div class="container mx-auto px-6 py-4 text-center text-gray-600">
+            <p>&copy; 2024 RapidGrab. All Rights Reserved.</p>
+        </div>
+    </footer>
 
     <script>
-        // DOM Elements
+        // --- DOM Element Selection ---
         const form = document.getElementById('download-form');
         const urlInput = document.getElementById('video-url');
-        const submitButton = document.getElementById('submit-button');
-        const buttonText = document.getElementById('button-text');
-        const loader = document.getElementById('loader');
-        const errorMessage = document.getElementById('error-message');
-        const errorText = document.getElementById('error-text');
-        const resultsContainer = document.getElementById('results-container');
-        const thumbnail = document.getElementById('thumbnail');
-        const videoTitle = document.getElementById('video-title');
-        const videoAuthor = document.getElementById('video-author');
-        const downloadLinksContainer = document.getElementById('download-links');
+        const downloadBtn = document.getElementById('download-btn');
+        const resultsSection = document.getElementById('results-section');
+        const loadingSpinner = document.getElementById('loading');
+        const errorMessageDiv = document.getElementById('error-message');
+        const downloadLinksDiv = document.getElementById('download-links');
 
-        // The public API endpoint
-        const API_ENDPOINT = "https://co.wuk.sh/api/json";
+        // --- Cobalt API Endpoint with a more robust CORS Proxy ---
+        // Using corsproxy.io which is generally reliable for POST requests.
+        const PROXY_URL = 'https://corsproxy.io/?';
+        const TARGET_API_URL = 'https://api.cobalt.tools/api/json';
+        const COBALT_API_URL = `${PROXY_URL}${encodeURIComponent(TARGET_API_URL)}`;
 
-        /**
-         * Handles the form submission.
-         * @param {Event} e - The form submission event.
-         */
+        // --- Event Listener for Form Submission ---
         form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+            e.preventDefault(); // Prevent default form submission
             const videoUrl = urlInput.value.trim();
 
             if (!videoUrl) {
-                showError("Please enter a YouTube URL.");
+                showError('Please enter a YouTube URL.');
                 return;
             }
-
-            // Reset UI
-            hideError();
-            resultsContainer.classList.add('hidden');
-            downloadLinksContainer.innerHTML = '';
-            setLoading(true);
+            
+            // Reset UI for new request
+            resetUI();
+            loadingSpinner.classList.remove('hidden');
 
             try {
-                // Prepare the request to the Cobalt API
-                const response = await fetch(API_ENDPOINT, {
+                // --- Make API Request to Cobalt via Proxy ---
+                const response = await fetch(COBALT_API_URL, {
                     method: 'POST',
                     headers: {
+                        'Content-Type': 'application/json',
                         'Accept': 'application/json',
-                        'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        url: videoUrl,
-                        vQuality: '1080', // Request a good default quality
-                        isAudioOnly: false
-                    })
+                    body: JSON.stringify({ url: videoUrl }),
                 });
 
-                const result = await response.json();
-
-                // Check for errors from the API
-                if (result.status === 'error' || result.status === 'redirect') {
-                     showError(result.text || "Could not process the video. The URL might be invalid or private.");
-                } else if (result.status === 'stream') {
-                    // On success, display the results
-                    displayResults(result);
-                } else {
-                    showError("An unknown error occurred. The API might be down.");
+                if (!response.ok) {
+                     // Log the detailed error response
+                    const errorText = await response.text();
+                    console.error('API Response Error:', response.status, response.statusText, errorText);
+                    throw new Error(`API returned an error: ${response.status}`);
                 }
 
-            } catch (err) {
-                console.error("Fetch error:", err);
-                showError("Failed to connect to the download service. Please check your internet connection or try again later.");
-            } finally {
-                setLoading(false);
+                const result = await response.json();
+                loadingSpinner.classList.add('hidden');
+                
+                // --- Handle API Response ---
+                handleApiResponse(result);
+
+            } catch (error) {
+                console.error('Fetch Error:', error);
+                loadingSpinner.classList.add('hidden');
+                showError('Request failed. The API might be temporarily down or the URL is not supported.');
             }
         });
 
         /**
-         * Displays the video information and download links.
-         * @param {object} data - The API response data.
+         * Handles the JSON response from the Cobalt API and updates the UI accordingly.
+         * @param {object} result - The parsed JSON response from the API.
          */
-        function displayResults(data) {
-            thumbnail.src = data.picker.find(p => p.type === 'video')?.thumb || 'https://placehold.co/320x180/e2e8f0/4a5568?text=Thumbnail';
-            videoTitle.textContent = data.picker.find(p => p.type === 'video')?.title || 'Unknown Title';
-            videoAuthor.textContent = `by ${data.picker.find(p => p.type === 'video')?.author || 'Unknown Author'}`;
-
-            // Create video download links
-            if (data.picker) {
-                data.picker.forEach(item => {
-                    if (item.url) {
-                        const quality = item.quality ? `${item.quality}p` : (item.type === 'audio' ? 'Audio' : 'Video');
-                        const format = item.format || 'mp4';
-                        const link = createDownloadButton(item.url, `${quality} (${format.toUpperCase()})`, item.type);
-                        downloadLinksContainer.appendChild(link);
-                    }
-                });
+        function handleApiResponse(result) {
+            switch (result.status) {
+                case 'error':
+                    showError(result.text || 'An unknown error occurred.');
+                    break;
+                case 'redirect':
+                case 'stream':
+                    // This status means a direct download link is available.
+                    displayDownloadLink({
+                        url: result.url,
+                        type: 'video',
+                        quality: 'Best',
+                        text: 'Direct Download'
+                    });
+                    break;
+                case 'picker':
+                    // This status provides multiple download options.
+                    displayPickerOptions(result.picker);
+                    break;
+                default:
+                    showError(`Received an unhandled status: ${result.status}`);
+                    break;
             }
-            
-            // Add the main audio-only link if available
-            if(data.audio) {
-                 const audioLink = createDownloadButton(data.audio, 'Best Audio (MP3)', 'audio');
-                 downloadLinksContainer.appendChild(audioLink);
-            }
-
-
-            resultsContainer.classList.remove('hidden');
         }
 
         /**
-         * Creates a styled download button.
-         * @param {string} url - The download URL.
-         * @param {string} text - The text to display on the button.
-         * @param {string} type - 'video' or 'audio'.
-         * @returns {HTMLAnchorElement} The created anchor element.
+         * Displays multiple download options from the 'picker' response.
+         * @param {Array<object>} pickerItems - An array of download options.
          */
-        function createDownloadButton(url, text, type) {
+        function displayPickerOptions(pickerItems) {
+            if (!pickerItems || pickerItems.length === 0) {
+                showError('No download options were found.');
+                return;
+            }
+            
+            // Group items by type to ensure consistent ordering
+            const videoItems = pickerItems.filter(item => item.type !== 'audio');
+            const audioItems = pickerItems.filter(item => item.type === 'audio');
+
+            // Display Video Options First
+            if (videoItems.length > 0) {
+                const videoHeader = document.createElement('h3');
+                videoHeader.className = 'col-span-full text-xl font-semibold text-left mb-2';
+                videoHeader.textContent = 'Video Options';
+                downloadLinksDiv.appendChild(videoHeader);
+                videoItems.forEach(item => {
+                    displayDownloadLink({
+                        url: item.url,
+                        type: 'video',
+                        quality: item.quality || 'SD',
+                        text: item.label || 'Download Video'
+                    });
+                });
+            }
+
+            // Display Audio Options Second
+            if (audioItems.length > 0) {
+                const audioHeader = document.createElement('h3');
+                audioHeader.className = 'col-span-full text-xl font-semibold text-left mb-2 mt-4';
+                audioHeader.textContent = 'Audio Options';
+                downloadLinksDiv.appendChild(audioHeader);
+                audioItems.forEach(item => {
+                    displayDownloadLink({
+                        url: item.url,
+                        type: 'audio',
+                        quality: 'MP3', // Cobalt typically provides MP3 for audio
+                        text: 'Download Audio'
+                    });
+                });
+            }
+        }
+
+        /**
+         * Creates and appends a single download link button to the results container.
+         * @param {object} linkInfo - Information about the download link.
+         * @param {string} linkInfo.url - The download URL.
+         * @param {string} linkInfo.type - The type of file (e.g., 'video', 'audio').
+         * @param {string} linkInfo.quality - The quality label (e.g., '1080p', 'MP3').
+         * @param {string} linkInfo.text - The button text.
+         */
+        function displayDownloadLink({ url, type, quality, text }) {
             const link = document.createElement('a');
             link.href = url;
             link.target = '_blank'; // Open in new tab to start download
             link.rel = 'noopener noreferrer';
+            link.className = 'block bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105 text-center';
             
-            const bgColor = type === 'audio' ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600';
+            const qualitySpan = `<span class="block text-sm font-normal opacity-80">${quality}</span>`;
+            link.innerHTML = `${text} ${qualitySpan}`;
             
-            link.className = `flex items-center justify-center gap-2 p-3 ${bgColor} text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition duration-300`;
-            
-            const iconSvg = type === 'audio' 
-                ? `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>`
-                : `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"></path><rect width="14" height="12" x="2" y="6" rx="2" ry="2"></rect></svg>`;
-            
-            link.innerHTML = `${iconSvg}<span>${text}</span>`;
-            
-            return link;
+            downloadLinksDiv.appendChild(link);
         }
 
         /**
-         * Sets the loading state of the UI.
-         * @param {boolean} isLoading - Whether to show the loader.
-         */
-        function setLoading(isLoading) {
-            if (isLoading) {
-                buttonText.classList.add('hidden');
-                loader.classList.remove('hidden');
-                submitButton.disabled = true;
-                submitButton.classList.add('cursor-not-allowed');
-            } else {
-                buttonText.classList.remove('hidden');
-                loader.classList.add('hidden');
-                submitButton.disabled = false;
-                submitButton.classList.remove('cursor-not-allowed');
-            }
-        }
-
-        /**
-         * Shows an error message in the UI.
+         * Displays an error message in the UI.
          * @param {string} message - The error message to display.
          */
         function showError(message) {
-            errorText.textContent = message;
-            errorMessage.classList.remove('hidden');
+            errorMessageDiv.textContent = message;
+            errorMessageDiv.classList.remove('hidden');
         }
 
         /**
-         * Hides the error message.
+         * Resets the UI to its initial state before a new request.
          */
-        function hideError() {
-            errorMessage.classList.add('hidden');
+        function resetUI() {
+            loadingSpinner.classList.add('hidden');
+            errorMessageDiv.classList.add('hidden');
+            downloadLinksDiv.innerHTML = ''; // Clear previous links
         }
     </script>
 </body>
-</html>
+            </html>
+                                                                                                                                                                                                                                                                                    

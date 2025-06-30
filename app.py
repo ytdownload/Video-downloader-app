@@ -5,13 +5,8 @@ import traceback
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 
-# We only need the core pytube components now
-try:
-    from pytube import YouTube
-    from pytube.exceptions import PytubeError
-    PYTUBE_AVAILABLE = True
-except ImportError:
-    PYTUBE_AVAILABLE = False
+# The new, more reliable downloader library
+import yt_dlp
 
 # --- Configuration for Production (Render) ---
 DOWNLOAD_DIRECTORY = os.environ.get('DOWNLOAD_DIR', 'downloads')
@@ -38,23 +33,18 @@ setup_server()
 @app.route('/')
 def index():
     """A simple root endpoint to confirm the backend is running."""
-    pytube_status = "available" if PYTUBE_AVAILABLE else "NOT available"
-    return f"<h1>YouTube Downloader Backend is running!</h1><p>Pytube library is {pytube_status}.</p>"
+    return "<h1>YouTube Downloader Backend is running with yt-dlp!</h1>"
 
 
 @app.route('/api/video-info', methods=['POST', 'OPTIONS'])
 def download_video():
     """
-    Handles the video download request, including the CORS OPTIONS preflight.
-    This version removes the failing patch and relies on the base pytube library.
+    Handles the video download request using the yt-dlp library.
     """
     if request.method == 'OPTIONS':
         return jsonify({'status': 'ok'}), 200
 
     if request.method == 'POST':
-        if not PYTUBE_AVAILABLE:
-            return jsonify({"error": "Server configuration error: Video library is unavailable."}), 500
-
         try:
             url = request.get_json().get('url')
             if not url:
@@ -63,36 +53,46 @@ def download_video():
             return jsonify({"error": "Invalid request format."}), 400
 
         try:
-            print(f"Processing URL: {url}")
-            yt = YouTube(url)
-            stream = yt.streams.get_highest_resolution()
+            print(f"Processing URL with yt-dlp: {url}")
 
-            if not stream:
-                return jsonify({"error": "No downloadable stream found for this video."}), 404
+            # 1. Set up yt-dlp options
+            # We specify the output path and filename format.
+            # We also ask for the best quality mp4 video and audio.
+            ydl_opts = {
+                'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+                'outtmpl': os.path.join(DOWNLOAD_DIRECTORY, '%(title)s.%(ext)s'),
+            }
 
-            print(f"Downloading '{yt.title}'...")
-            stream.download(output_path=DOWNLOAD_DIRECTORY)
-            filename = stream.default_filename
-            print(f"SUCCESS: Downloaded '{filename}'")
+            # 2. Extract video info without downloading
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info_dict = ydl.extract_info(url, download=False)
+                video_title = info_dict.get('title', 'Unknown Title')
+                thumbnail_url = info_dict.get('thumbnail', None)
+                # Get the filename that yt-dlp *would* create
+                filename = ydl.prepare_filename(info_dict)
+                # We only want the basename, not the full path
+                base_filename = os.path.basename(filename)
 
+                print(f"Video Title: {video_title}")
+                print(f"Filename: {base_filename}")
+
+                # 3. Now, perform the actual download
+                print(f"Downloading '{video_title}'...")
+                ydl.download([url])
+                print(f"SUCCESS: Downloaded '{base_filename}'")
+
+            # 4. Return the info to the frontend
             return jsonify({
                 "message": "Download successful!",
-                "filename": filename,
-                "video_title": yt.title,
-                "thumbnail_url": yt.thumbnail_url
+                "filename": base_filename,
+                "video_title": video_title,
+                "thumbnail_url": thumbnail_url
             }), 200
 
-        # This is the most likely error block to be triggered now.
-        except PytubeError as e:
-            print(f"PYTUBE ERROR: {e}")
-            traceback.print_exc()
-            # Provide a more helpful error message to the frontend
-            return jsonify({"error": "The video library failed to process this specific video. It may be age-restricted, private, or a format the library cannot handle."}), 500
-        
         except Exception as e:
-            print(f"UNEXPECTED ERROR: {e}")
+            print(f"ERROR processing video with yt-dlp: {e}")
             traceback.print_exc()
-            return jsonify({"error": "An unexpected server error occurred."}), 500
+            return jsonify({"error": "Failed to process this video with the new library. Please check the URL."}), 500
 
 
 @app.route('/downloads/<path:filename>')
@@ -109,4 +109,3 @@ def get_file(filename):
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
-    

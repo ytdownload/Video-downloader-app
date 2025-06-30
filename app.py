@@ -5,9 +5,9 @@ import traceback
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 
-# It's good practice to handle potential import errors in production
+# We only need the core pytube components now
 try:
-    from pytube import YouTube, cipher
+    from pytube import YouTube
     from pytube.exceptions import PytubeError
     PYTUBE_AVAILABLE = True
 except ImportError:
@@ -20,6 +20,7 @@ DOWNLOAD_DIRECTORY = os.environ.get('DOWNLOAD_DIR', 'downloads')
 app = Flask(__name__)
 
 # --- CORS Configuration ---
+# This is correct and allows your frontend to make requests.
 origins = ["https://ytdownload.github.io"]
 CORS(app, origins=origins, supports_credentials=True)
 
@@ -45,33 +46,23 @@ def index():
 def download_video():
     """
     Handles the video download request, including the CORS OPTIONS preflight.
+    This version removes the failing patch and relies on the base pytube library.
     """
     if request.method == 'OPTIONS':
         return jsonify({'status': 'ok'}), 200
 
     if request.method == 'POST':
-        print("\n--- Received POST request on /api/video-info ---")
-
         if not PYTUBE_AVAILABLE:
-            print("ERROR: Pytube library failed to import on the server.")
             return jsonify({"error": "Server configuration error: Video library is unavailable."}), 500
 
         try:
-            data = request.get_json()
-            url = data.get('url')
+            url = request.get_json().get('url')
             if not url:
-                return jsonify({"error": "URL is required in the request body."}), 400
+                return jsonify({"error": "URL is required."}), 400
         except Exception:
-            return jsonify({"error": "Invalid request format. Expecting JSON."}), 400
+            return jsonify({"error": "Invalid request format."}), 400
 
         try:
-            # --- THE FIX IS HERE ---
-            # This line attempts to update the internal signature logic of pytube,
-            # which is a common fix for HTTP 400 errors.
-            print("Attempting to apply pytube cipher patch...")
-            cipher.get_throttling_function_name()
-            print("Pytube cipher patch applied.")
-
             print(f"Processing URL: {url}")
             yt = YouTube(url)
             stream = yt.streams.get_highest_resolution()
@@ -91,16 +82,23 @@ def download_video():
                 "thumbnail_url": yt.thumbnail_url
             }), 200
 
-        except Exception as e:
-            print(f"ERROR processing video: {e}")
+        # This is the most likely error block to be triggered now.
+        except PytubeError as e:
+            print(f"PYTUBE ERROR: {e}")
             traceback.print_exc()
-            return jsonify({"error": "Failed to process video. It may be private, age-restricted, or an invalid link."}), 500
+            # Provide a more helpful error message to the frontend
+            return jsonify({"error": "The video library failed to process this specific video. It may be age-restricted, private, or a format the library cannot handle."}), 500
+        
+        except Exception as e:
+            print(f"UNEXPECTED ERROR: {e}")
+            traceback.print_exc()
+            return jsonify({"error": "An unexpected server error occurred."}), 500
 
 
 @app.route('/downloads/<path:filename>')
 def get_file(filename):
     """
-    This endpoint serves the downloaded video file to the user.
+    Serves the downloaded video file to the user.
     """
     try:
         return send_from_directory(DOWNLOAD_DIRECTORY, filename, as_attachment=True)

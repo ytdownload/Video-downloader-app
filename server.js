@@ -3,32 +3,22 @@
 const express = require('express');
 const cors = require('cors');
 const YTDlpWrap = require('yt-dlp-wrap').default;
-const path = require('path');
-const fs = require('fs');
 
 // --- Initialize App and yt-dlp ---
 const app = express();
 const PORT = process.env.PORT || 4000;
 const ytDlpWrap = new YTDlpWrap();
 
-// --- CRITICAL: Download yt-dlp on Server Start ---
-// This is a more robust way to ensure yt-dlp is available.
+// --- CRITICAL FIX: Download yt-dlp on Server Start ---
+// This simpler method is more robust and avoids the previous crash.
 (async () => {
     try {
-        // Get the path where yt-dlp should be.
-        const ytDlpPath = YTDlpWrap.getBinaryPath();
-        
-        // Check if the file already exists.
-        if (fs.existsSync(ytDlpPath)) {
-            console.log('yt-dlp binary already exists.');
-        } else {
-            console.log('yt-dlp binary not found, starting download...');
-            // If it doesn't exist, download it.
-            await YTDlpWrap.downloadFromGithub();
-            console.log('yt-dlp binary downloaded successfully.');
-        }
+        console.log('Downloading latest yt-dlp binary...');
+        // This command is safe to run every time. It will only download if needed.
+        await YTDlpWrap.downloadFromGithub();
+        console.log('yt-dlp binary is ready.');
     } catch (error) {
-        console.error('Failed to download yt-dlp binary:', error);
+        console.error('FATAL: Failed to download yt-dlp binary:', error);
         // If download fails, the app can't work, so we exit.
         process.exit(1);
     }

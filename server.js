@@ -1,9 +1,3 @@
-
-#### 2. `server.js` (The `yt-dlp` API Logic)
-This code is correct and works with the `package.json` above. It runs the powerful `yt-dlp` command on the server.
-
-
-```javascript
 // server.js
 
 const express = require('express');

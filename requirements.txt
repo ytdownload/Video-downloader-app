@@ -1,5 +1,4 @@
 # backend/requirements.txt
 Flask
-pytube
 Flask-Cors
-gunicorn
+yt-dlp

@@ -222,7 +222,7 @@
 
                 // Filter for useful video formats (mp4, with video and audio)
                 const videoFormats = formats
-                    .filter(f => f.vcodec !== 'none' && f.acodec !== 'none' && f.ext === 'mp4')
+                    .filter(f => f && f.vcodec !== 'none' && f.acodec !== 'none' && f.ext === 'mp4')
                     .sort((a, b) => (b.height || 0) - (a.height || 0));
                 
                 videoFormats.forEach(f => {
@@ -238,7 +238,7 @@
                 
                 // Find the best audio-only format
                 const audioFormats = formats
-                    .filter(f => f.vcodec === 'none' && f.acodec !== 'none')
+                    .filter(f => f && f.vcodec === 'none' && f.acodec !== 'none')
                     .sort((a, b) => (b.abr || 0) - (a.abr || 0));
 
                 if (audioFormats.length > 0) {
@@ -272,4 +272,5 @@
         }
     </script>
 </body>
-</html>
+                            </html>
+                            

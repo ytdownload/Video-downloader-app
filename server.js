@@ -3,11 +3,37 @@
 const express = require('express');
 const cors = require('cors');
 const YTDlpWrap = require('yt-dlp-wrap').default;
+const path = require('path');
+const fs = require('fs');
 
 // --- Initialize App and yt-dlp ---
 const app = express();
 const PORT = process.env.PORT || 4000;
 const ytDlpWrap = new YTDlpWrap();
+
+// --- CRITICAL: Download yt-dlp on Server Start ---
+// This is a more robust way to ensure yt-dlp is available.
+(async () => {
+    try {
+        // Get the path where yt-dlp should be.
+        const ytDlpPath = YTDlpWrap.getBinaryPath();
+        
+        // Check if the file already exists.
+        if (fs.existsSync(ytDlpPath)) {
+            console.log('yt-dlp binary already exists.');
+        } else {
+            console.log('yt-dlp binary not found, starting download...');
+            // If it doesn't exist, download it.
+            await YTDlpWrap.downloadFromGithub();
+            console.log('yt-dlp binary downloaded successfully.');
+        }
+    } catch (error) {
+        console.error('Failed to download yt-dlp binary:', error);
+        // If download fails, the app can't work, so we exit.
+        process.exit(1);
+    }
+})();
+
 
 // --- Middleware ---
 app.use(cors());
@@ -28,11 +54,7 @@ app.post('/api/video-info', async (req, res) => {
 
     try {
         console.log(`Fetching metadata for: ${videoUrl}`);
-        // This runs the command: yt-dlp --dump-json <videoUrl>
-        // It gets all video data as a JSON object without downloading the file.
         const metadata = await ytDlpWrap.getVideoInfo(videoUrl);
-        
-        // We now have the full data from yt-dlp and can send it to the frontend.
         res.json({ success: true, data: metadata });
 
     } catch (error) {
@@ -42,7 +64,6 @@ app.post('/api/video-info', async (req, res) => {
 });
 
 // --- API Endpoint to Trigger a Download ---
-// This endpoint gets the direct download link and redirects the user's browser to it.
 app.get('/api/download', async (req, res) => {
     const { videoUrl, formatId } = req.query;
 
@@ -52,14 +73,7 @@ app.get('/api/download', async (req, res) => {
 
     try {
         console.log(`Getting download link for format: ${formatId}`);
-        // This runs the command: yt-dlp -f <formatId> --get-url <videoUrl>
-        // It gets the direct, temporary download URL for the chosen format.
-        const downloadUrl = await ytDlpWrap.getUrl(videoUrl, [
-            '-f', formatId
-        ]);
-
-        // Redirect the user's browser to the direct download link.
-        // This starts the download on their computer.
+        const downloadUrl = await ytDlpWrap.getUrl(videoUrl, ['-f', formatId]);
         res.redirect(downloadUrl);
 
     } catch (error) {

@@ -7,7 +7,7 @@ from flask_cors import CORS
 
 # It's good practice to handle potential import errors in production
 try:
-    from pytube import YouTube
+    from pytube import YouTube, cipher
     from pytube.exceptions import PytubeError
     PYTUBE_AVAILABLE = True
 except ImportError:
@@ -20,7 +20,6 @@ DOWNLOAD_DIRECTORY = os.environ.get('DOWNLOAD_DIR', 'downloads')
 app = Flask(__name__)
 
 # --- CORS Configuration ---
-# This correctly allows your specific frontend URL to make requests.
 origins = ["https://ytdownload.github.io"]
 CORS(app, origins=origins, supports_credentials=True)
 
@@ -42,18 +41,14 @@ def index():
     return f"<h1>YouTube Downloader Backend is running!</h1><p>Pytube library is {pytube_status}.</p>"
 
 
-# --- Main Endpoint with the FIX ---
-# This route now accepts 'OPTIONS' requests and handles them correctly.
 @app.route('/api/video-info', methods=['POST', 'OPTIONS'])
 def download_video():
     """
     Handles the video download request, including the CORS OPTIONS preflight.
     """
-    # This block handles the browser's preflight security check.
     if request.method == 'OPTIONS':
         return jsonify({'status': 'ok'}), 200
 
-    # This block handles the actual download request.
     if request.method == 'POST':
         print("\n--- Received POST request on /api/video-info ---")
 
@@ -70,6 +65,13 @@ def download_video():
             return jsonify({"error": "Invalid request format. Expecting JSON."}), 400
 
         try:
+            # --- THE FIX IS HERE ---
+            # This line attempts to update the internal signature logic of pytube,
+            # which is a common fix for HTTP 400 errors.
+            print("Attempting to apply pytube cipher patch...")
+            cipher.get_throttling_function_name()
+            print("Pytube cipher patch applied.")
+
             print(f"Processing URL: {url}")
             yt = YouTube(url)
             stream = yt.streams.get_highest_resolution()

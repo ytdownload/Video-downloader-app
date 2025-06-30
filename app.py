@@ -4,8 +4,6 @@ import os
 import traceback
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-
-# The new, more reliable downloader library
 import yt_dlp
 
 # --- Configuration for Production (Render) ---
@@ -15,7 +13,6 @@ DOWNLOAD_DIRECTORY = os.environ.get('DOWNLOAD_DIR', 'downloads')
 app = Flask(__name__)
 
 # --- CORS Configuration ---
-# This is correct and allows your frontend to make requests.
 origins = ["https://ytdownload.github.io"]
 CORS(app, origins=origins, supports_credentials=True)
 
@@ -39,7 +36,7 @@ def index():
 @app.route('/api/video-info', methods=['POST', 'OPTIONS'])
 def download_video():
     """
-    Handles the video download request using the yt-dlp library.
+    Handles the video download request using yt-dlp with anti-bot-detection measures.
     """
     if request.method == 'OPTIONS':
         return jsonify({'status': 'ok'}), 200
@@ -55,33 +52,39 @@ def download_video():
         try:
             print(f"Processing URL with yt-dlp: {url}")
 
-            # 1. Set up yt-dlp options
-            # We specify the output path and filename format.
-            # We also ask for the best quality mp4 video and audio.
+            # --- THE FIX IS HERE ---
+            # We are adding options to make our request look more like a browser
+            # and to ignore some common server-side issues.
             ydl_opts = {
                 'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
                 'outtmpl': os.path.join(DOWNLOAD_DIRECTORY, '%(title)s.%(ext)s'),
+                'noplaylist': True,
+                'no_warnings': True,
+                'ignoreerrors': True,
+                'nocheckcertificate': True,
+                # This pretends we are a real browser, which can bypass bot detection
+                'http_headers': {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+                }
             }
 
-            # 2. Extract video info without downloading
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info_dict = ydl.extract_info(url, download=False)
+                
+                # Check if yt-dlp signaled an error for this video
+                if info_dict is None:
+                    raise Exception("yt-dlp failed to extract video information. The video may be unavailable.")
+
                 video_title = info_dict.get('title', 'Unknown Title')
                 thumbnail_url = info_dict.get('thumbnail', None)
-                # Get the filename that yt-dlp *would* create
                 filename = ydl.prepare_filename(info_dict)
-                # We only want the basename, not the full path
                 base_filename = os.path.basename(filename)
 
-                print(f"Video Title: {video_title}")
-                print(f"Filename: {base_filename}")
-
-                # 3. Now, perform the actual download
                 print(f"Downloading '{video_title}'...")
+                # Perform the actual download
                 ydl.download([url])
                 print(f"SUCCESS: Downloaded '{base_filename}'")
 
-            # 4. Return the info to the frontend
             return jsonify({
                 "message": "Download successful!",
                 "filename": base_filename,
@@ -92,7 +95,11 @@ def download_video():
         except Exception as e:
             print(f"ERROR processing video with yt-dlp: {e}")
             traceback.print_exc()
-            return jsonify({"error": "Failed to process this video with the new library. Please check the URL."}), 500
+            # Return a more specific error message to the user
+            error_message = str(e)
+            if "Sign in to confirm" in error_message:
+                return jsonify({"error": "This video is protected by YouTube's anti-bot measures and cannot be downloaded from a server."}), 500
+            return jsonify({"error": "Failed to process this video. It may be private or have other restrictions."}), 500
 
 
 @app.route('/downloads/<path:filename>')
@@ -109,3 +116,4 @@ def get_file(filename):
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
+    

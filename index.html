@@ -17,7 +17,7 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-    <!-- Header -->
+    <!-- Header (No Changes) -->
     <header class="bg-white shadow-md">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <h1 class="text-2xl font-bold text-blue-600">RapidGrab</h1>
@@ -31,7 +31,7 @@
     <!-- Main Content Area -->
     <main class="container mx-auto px-6 py-12">
 
-        <!-- Login Form -->
+        <!-- Login Form (No Changes) -->
         <div id="login-section" class="max-w-md mx-auto">
             <div class="bg-white p-8 rounded-xl shadow-lg text-center">
                 <h2 class="text-2xl font-bold mb-6">Sign In / Sign Up</h2>
@@ -57,7 +57,7 @@
             </div>
         </div>
 
-        <!-- Downloader Section (Hidden by default) -->
+        <!-- Downloader Section (No HTML changes, only JS logic) -->
         <div id="downloader-section" class="hidden max-w-3xl mx-auto text-center">
             <h2 class="text-3xl md:text-4xl font-bold mb-2">YouTube Video Downloader</h2>
             <p class="text-gray-600 mb-8">Paste a YouTube video URL below to download it.</p>
@@ -65,25 +65,25 @@
                 <form id="download-form" class="flex flex-col sm:flex-row gap-4">
                     <input type="text" id="video-url" placeholder="https://www.youtube.com/watch?v=..." class="flex-grow w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     <button type="submit" id="download-btn" class="bg-blue-600 text-white font-semibold px-8 py-3 rounded-lg hover:bg-blue-700 transition-all flex items-center justify-center">
-                        <svg id="btn-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="mr-2" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                        <span id="btn-icon-wrapper">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="mr-2" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                        </span>
                         <span id="btn-text">Download</span>
                     </button>
                 </form>
             </div>
-            <div id="results-section" class="mt-8 text-left">
-                <div id="results-error" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg" role="alert"></div>
-                <div id="download-links"></div>
-            </div>
+            <!-- This is where the result will be displayed -->
+            <div id="results-section" class="mt-8 text-left"></div>
         </div>
 
     </main>
 
     <!-- Firebase SDK -->
     <script type="module">
+        // This part has no changes
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 
-        // --- Your Real Firebase Configuration ---
         const firebaseConfig = {
             apiKey: "AIzaSyCvIyq7hnhwZWzUg0M8TkV378_XaecMoGI",
             authDomain: "rapid-e9181.firebaseapp.com",
@@ -94,18 +94,18 @@
             measurementId: "G-2WNFZXMCTV"
         };
 
-        // --- Initialize Firebase and Attach All Logic ---
         try {
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
             const provider = new GoogleAuthProvider();
             setupAuthentication(auth, provider);
+            // We call our new, corrected downloader logic
             setupDownloader();
         } catch (error) {
             console.error("FIREBASE INITIALIZATION FAILED:", error);
         }
 
-        // --- Function to set up all authentication logic ---
+        // --- AUTHENTICATION LOGIC (No Changes) ---
         function setupAuthentication(auth, provider) {
             const loginSection = document.getElementById('login-section');
             const downloaderSection = document.getElementById('downloader-section');
@@ -165,112 +165,100 @@
             }
         }
 
-        // --- DOWNLOADER LOGIC for yt-dlp Backend ---
+        // --- CORRECTED DOWNLOADER LOGIC ---
         function setupDownloader() {
             const downloadForm = document.getElementById('download-form');
             const urlInput = document.getElementById('video-url');
             const downloadBtn = document.getElementById('download-btn');
+            const btnIconWrapper = document.getElementById('btn-icon-wrapper');
             const btnText = document.getElementById('btn-text');
-            const resultsErrorDiv = document.getElementById('results-error');
-            const downloadLinksDiv = document.getElementById('download-links');
+            const resultsSection = document.getElementById('results-section');
 
-            // --- CRITICAL: This is the URL of YOUR yt-dlp backend on Render ---
-            const BACKEND_API_URL = 'https://video-downloader-app-xxis.onrender.com';
+            // --- IMPORTANT: Replace with YOUR backend URL from Render ---
+            const BACKEND_URL = 'https://video-downloader-app-xxis.onrender.com';
 
             downloadForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const videoUrl = urlInput.value.trim();
-                if (!videoUrl) { return showResultsError('Please enter a YouTube URL.'); }
+                if (!videoUrl) { return; }
                 
-                resetDownloaderUI();
-                setDownloaderLoading(true);
+                // 1. Reset the UI and show loading state
+                resultsSection.innerHTML = ''; 
+                setLoading(true);
 
                 try {
-                    // Our frontend calls OUR backend
-                    const response = await fetch(`${BACKEND_API_URL}/api/video-info`, {
+                    // 2. Call our backend with the correct endpoint and body
+                    const response = await fetch(`${BACKEND_URL}/api/video-info`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ videoUrl: videoUrl }),
+                        // The backend expects the key to be "url"
+                        body: JSON.stringify({ url: videoUrl }),
                     });
 
-                    if (!response.ok) {
-                        throw new Error(`The server responded with an error.`);
-                    }
-                    
                     const result = await response.json();
 
-                    if (result.success) {
-                        displayDownloadOptions(result.data, videoUrl);
-                    } else {
-                        throw new Error(result.error || 'The backend returned an unknown error.');
+                    if (!response.ok) {
+                        // If the server returned an error (like 404 or 500)
+                        // throw an error to be caught by the catch block
+                        throw new Error(result.error || 'The server returned an unknown error.');
                     }
+                    
+                    // 3. On success, display the result
+                    displayDownloadLink(result);
+
                 } catch (error) { 
                     console.error('Download Error:', error);
-                    showResultsError(error.message);
+                    displayError(error.message);
                 } finally {
-                    setDownloaderLoading(false);
+                    // 4. Always stop the loading animation
+                    setLoading(false);
                 }
             });
 
-            function displayDownloadOptions(data, originalUrl) {
-                const title = data.title || 'Untitled Video';
-                const formats = Array.isArray(data.formats) ? data.formats : [];
+            function displayDownloadLink(data) {
+                // The backend gives us the title, thumbnail, and the exact filename
+                const { video_title, thumbnail_url, filename } = data;
 
-                let html = `<h3 class="text-2xl font-bold mb-4">${title}</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">`;
-                
-                let linksFound = false;
+                // We construct the direct download link to the /downloads/ endpoint
+                const downloadUrl = `${BACKEND_URL}/downloads/${encodeURIComponent(filename)}`;
 
-                // Filter for useful video formats (mp4, with video and audio)
-                const videoFormats = formats
-                    .filter(f => f && f.vcodec !== 'none' && f.acodec !== 'none' && f.ext === 'mp4')
-                    .sort((a, b) => (b.height || 0) - (a.height || 0));
-                
-                videoFormats.forEach(f => {
-                    const quality = f.format_note || `${f.height}p`;
-                    html += createLinkHtml({ 
-                        videoUrl: originalUrl, 
-                        formatId: f.format_id, 
-                        quality: quality, 
-                        text: `Download Video` 
-                    });
-                    linksFound = true;
-                });
-                
-                // Find the best audio-only format
-                const audioFormats = formats
-                    .filter(f => f && f.vcodec === 'none' && f.acodec !== 'none')
-                    .sort((a, b) => (b.abr || 0) - (a.abr || 0));
-
-                if (audioFormats.length > 0) {
-                     html += createLinkHtml({ 
-                        videoUrl: originalUrl, 
-                        formatId: audioFormats[0].format_id, 
-                        quality: 'Best Audio', 
-                        text: `Download Audio` 
-                    });
-                    linksFound = true;
-                }
-                
-                if (!linksFound) {
-                    showResultsError('No downloadable MP4 formats were found for this video.');
-                    return;
-                }
-
-                html += `</div>`;
-                downloadLinksDiv.innerHTML = html;
+                // Create the HTML for the result card
+                resultsSection.innerHTML = `
+                    <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col sm:flex-row items-center gap-6">
+                        <img src="${thumbnail_url}" alt="Video Thumbnail" class="w-full sm:w-48 rounded-lg shadow-md">
+                        <div class="flex-grow text-center sm:text-left">
+                            <h3 class="text-xl font-bold mb-4">${video_title}</h3>
+                            <a href="${downloadUrl}" target="_blank" class="inline-block w-full sm:w-auto bg-green-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-600 transition-all">
+                                Download Video (Highest Quality)
+                            </a>
+                        </div>
+                    </div>
+                `;
             }
 
-            function createLinkHtml({ videoUrl, formatId, quality, text }) {
-                // The link points to our own /api/download endpoint
-                const downloadUrl = `${BACKEND_API_URL}/api/download?videoUrl=${encodeURIComponent(videoUrl)}&formatId=${formatId}`;
-                return `<a href="${downloadUrl}" target="_blank" class="block bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 transition-all text-center">${text}<span class="block text-sm font-normal opacity-80">${quality}</span></a>`;
+            function displayError(message) {
+                resultsSection.innerHTML = `
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg" role="alert">
+                        <strong class="font-bold">Error:</strong>
+                        <span class="block sm:inline">${message}</span>
+                    </div>
+                `;
             }
 
-            function showResultsError(message) { resultsErrorDiv.textContent = message; resultsErrorDiv.classList.remove('hidden'); }
-            function resetDownloaderUI() { resultsErrorDiv.classList.add('hidden'); downloadLinksDiv.innerHTML = ''; }
-            function setDownloaderLoading(isLoading) { downloadBtn.disabled = isLoading; btnText.textContent = isLoading ? 'Fetching...' : 'Download'; }
+            function setLoading(isLoading) {
+                downloadBtn.disabled = isLoading;
+                if (isLoading) {
+                    btnText.textContent = 'Fetching...';
+                    // Replace icon with a spinner
+                    btnIconWrapper.innerHTML = `<div class="spinner mr-2"></div>`;
+                } else {
+                    btnText.textContent = 'Download';
+                    // Restore original icon
+                    btnIconWrapper.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="mr-2" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>`;
+                }
+            }
         }
     </script>
 </body>
-                            </html>
-                            
+                        </html>
+    

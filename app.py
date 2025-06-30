@@ -1,10 +1,17 @@
 # app.py
 # Import necessary libraries
 import os
+import traceback
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-from pytube import YouTube
-from pytube.exceptions import PytubeError
+
+# It's good practice to handle potential import errors in production
+try:
+    from pytube import YouTube
+    from pytube.exceptions import PytubeError
+    PYTUBE_AVAILABLE = True
+except ImportError:
+    PYTUBE_AVAILABLE = False
 
 # --- Configuration for Production (Render) ---
 DOWNLOAD_DIRECTORY = os.environ.get('DOWNLOAD_DIR', 'downloads')
@@ -12,13 +19,9 @@ DOWNLOAD_DIRECTORY = os.environ.get('DOWNLOAD_DIR', 'downloads')
 # --- Flask App Initialization ---
 app = Flask(__name__)
 
-# --- CORS Configuration (Final and Secure) ---
-# Based on your frontend URL, we are now explicitly allowing ONLY
-# your GitHub Pages site to make requests. This is the correct and
-# secure way to configure CORS for a production application.
-origins = [
-    "https://ytdownload.github.io"
-]
+# --- CORS Configuration ---
+# This correctly allows your specific frontend URL to make requests.
+origins = ["https://ytdownload.github.io"]
 CORS(app, origins=origins, supports_credentials=True)
 
 
@@ -26,12 +29,7 @@ CORS(app, origins=origins, supports_credentials=True)
 def setup_server():
     """Creates the download directory if it doesn't exist."""
     if not os.path.exists(DOWNLOAD_DIRECTORY):
-        try:
-            os.makedirs(DOWNLOAD_DIRECTORY)
-            print(f"Successfully created download directory at: {DOWNLOAD_DIRECTORY}")
-        except OSError as e:
-            print(f"Error creating directory {DOWNLOAD_DIRECTORY}: {e}")
-            raise
+        os.makedirs(DOWNLOAD_DIRECTORY)
 
 setup_server()
 
@@ -40,56 +38,61 @@ setup_server()
 @app.route('/')
 def index():
     """A simple root endpoint to confirm the backend is running."""
-    return "<h1>YouTube Downloader Backend is running!</h1><p>CORS is correctly configured for ytdownload.github.io.</p>"
+    pytube_status = "available" if PYTUBE_AVAILABLE else "NOT available"
+    return f"<h1>YouTube Downloader Backend is running!</h1><p>Pytube library is {pytube_status}.</p>"
 
-@app.route('/api/download', methods=['POST'])
+
+# --- Main Endpoint with the FIX ---
+# This route now accepts 'OPTIONS' requests and handles them correctly.
+@app.route('/api/video-info', methods=['POST', 'OPTIONS'])
 def download_video():
     """
-    This is the main endpoint for handling video downloads.
+    Handles the video download request, including the CORS OPTIONS preflight.
     """
-    print("Received a download request.")
+    # This block handles the browser's preflight security check.
+    if request.method == 'OPTIONS':
+        return jsonify({'status': 'ok'}), 200
 
-    try:
-        data = request.get_json()
-        if not data or 'url' not in data:
-            print("Error: Invalid or missing JSON payload with 'url' key.")
-            return jsonify({"error": "URL is required in JSON payload"}), 400
-        url = data['url']
-    except Exception as e:
-        print(f"Error parsing request JSON: {e}")
-        return jsonify({"error": "Invalid request format. Expecting JSON with a 'url' key."}), 400
+    # This block handles the actual download request.
+    if request.method == 'POST':
+        print("\n--- Received POST request on /api/video-info ---")
 
-    print(f"Attempting to download video from: {url}")
+        if not PYTUBE_AVAILABLE:
+            print("ERROR: Pytube library failed to import on the server.")
+            return jsonify({"error": "Server configuration error: Video library is unavailable."}), 500
 
-    try:
-        yt = YouTube(url)
-        stream = yt.streams.get_highest_resolution()
+        try:
+            data = request.get_json()
+            url = data.get('url')
+            if not url:
+                return jsonify({"error": "URL is required in the request body."}), 400
+        except Exception:
+            return jsonify({"error": "Invalid request format. Expecting JSON."}), 400
 
-        if not stream:
-            print(f"Error: No downloadable stream found for URL: {url}")
-            return jsonify({"error": "No downloadable stream found for this video."}), 404
+        try:
+            print(f"Processing URL: {url}")
+            yt = YouTube(url)
+            stream = yt.streams.get_highest_resolution()
 
-        print(f"Downloading '{yt.title}'...")
-        stream.download(output_path=DOWNLOAD_DIRECTORY)
-        filename = stream.default_filename
-        print(f"Successfully downloaded '{filename}' to '{DOWNLOAD_DIRECTORY}'")
+            if not stream:
+                return jsonify({"error": "No downloadable stream found for this video."}), 404
 
-        return jsonify({
-            "message": "Download successful!",
-            "filename": filename,
-            "video_title": yt.title,
-            "thumbnail_url": yt.thumbnail_url
-        }), 200
+            print(f"Downloading '{yt.title}'...")
+            stream.download(output_path=DOWNLOAD_DIRECTORY)
+            filename = stream.default_filename
+            print(f"SUCCESS: Downloaded '{filename}'")
 
-    except PytubeError as e:
-        error_message = f"An error occurred with the video service: {str(e)}"
-        print(f"Error for URL '{url}': {error_message}")
-        return jsonify({"error": error_message}), 500
+            return jsonify({
+                "message": "Download successful!",
+                "filename": filename,
+                "video_title": yt.title,
+                "thumbnail_url": yt.thumbnail_url
+            }), 200
 
-    except Exception as e:
-        error_message = f"An unexpected server error occurred: {str(e)}"
-        print(f"Error for URL '{url}': {error_message}")
-        return jsonify({"error": "An unexpected server error occurred. Please try again later."}), 500
+        except Exception as e:
+            print(f"ERROR processing video: {e}")
+            traceback.print_exc()
+            return jsonify({"error": "Failed to process video. It may be private, age-restricted, or an invalid link."}), 500
 
 
 @app.route('/downloads/<path:filename>')
@@ -97,16 +100,13 @@ def get_file(filename):
     """
     This endpoint serves the downloaded video file to the user.
     """
-    print(f"Serving file: {filename} from {DOWNLOAD_DIRECTORY}")
     try:
         return send_from_directory(DOWNLOAD_DIRECTORY, filename, as_attachment=True)
     except FileNotFoundError:
-        print(f"Error: Requested file not found: {filename}")
-        return jsonify({"error": "File not found. It may have been moved or deleted."}), 404
+        return jsonify({"error": "File not found."}), 404
 
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    print(f"Starting Flask server for local development at http://0.0.0.0:{port}")
     app.run(host='0.0.0.0', port=port, debug=True)
     

@@ -1,5 +1,0 @@
-# backend/requirements.txt
-Flask
-Flask-Cors
-yt-dlp
-gunicorn

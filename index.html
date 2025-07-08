@@ -1,226 +1,362 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="scroll-behavior: smooth;">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YouTube Video Downloader</title>
-<script src="https://cdn.tailwindcss.com/3.4.16"></script>
-<script>tailwind.config={theme:{extend:{colors:{primary:'#FF0000',secondary:'#1F2937'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
-<style>
-:where([class^="ri-"])::before { content: "\f3c2"; }
-body {
-font-family: 'Inter', sans-serif;
-}
-.input-with-icon {
-position: relative;
-}
-.input-with-icon i {
-position: absolute;
-left: 1rem;
-top: 50%;
-transform: translateY(-50%);
-color: #9CA3AF;
-}
-.input-with-icon input {
-padding-left: 3rem;
-}
-</style>
+    <!-- Character Set and Viewport -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>Free YouTube Video Downloader - Download in MP4, MP3, HD</title>
+    <meta name="description" content="The fastest and easiest way to download YouTube videos for free. Convert and save videos in MP4, MP3, HD, 4K, and more formats. No registration required.">
+    <meta name="keywords" content="youtube downloader, download youtube videos, youtube to mp4, youtube to mp3, free youtube downloader, online video downloader, youtube converter">
+    <link rel="canonical" href="https://your-domain.com/"> <!-- Replace with your actual domain -->
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph (OG) Tags for Social Sharing -->
+    <meta property="og:title" content="Free YouTube Video Downloader - YTDownloader">
+    <meta property="og:description" content="Easily download and convert YouTube videos to MP4, MP3, and other formats in high quality. Fast, free, and no software installation needed.">
+    <meta property="og:image" content="https://your-domain.com/og-image.jpg"> <!-- Replace with a link to a preview image -->
+    <meta property="og:url" content="https://your-domain.com/">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free YouTube Video Downloader - YTDownloader">
+    <meta name="twitter:description" content="The best online tool to download YouTube videos quickly and for free. Supports HD, 4K, MP4, and MP3 conversion.">
+    <meta name="twitter:image" content="https://your-domain.com/twitter-image.jpg"> <!-- Replace with a link to a preview image -->
+
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <!-- Stylesheets and Fonts -->
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>tailwind.config={theme:{extend:{colors:{primary:'#FF0000',secondary:'#1F2937'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    
+    <style>
+        :where([class^="ri-"])::before { content: "\f3c2"; }
+        body { font-family: 'Inter', sans-serif; }
+        .input-with-icon { position: relative; }
+        .input-with-icon i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #9CA3AF; }
+        .input-with-icon input { padding-left: 3rem; }
+    </style>
+
+    <!-- JSON-LD Structured Data for FAQ -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [{
+        "@type": "Question",
+        "name": "Is this YouTube downloader completely free?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, our YouTube downloader is 100% free to use. There are no hidden charges, subscription fees, or premium plans. You can download as many videos as you want without any cost."
+        }
+      },{
+        "@type": "Question",
+        "name": "Is it legal to download YouTube videos?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Downloading videos from YouTube for personal use is generally acceptable. However, you should not use copyrighted content for commercial purposes without permission. We recommend only downloading non-copyrighted videos or videos you have permission to use."
+        }
+      },{
+        "@type": "Question",
+        "name": "What video and audio formats are supported?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Our tool supports a wide range of formats, including MP4, WebM, and MKV for video, and MP3, M4A, and OGG for audio. You can also choose from various quality options, from 360p up to 4K, depending on the original video."
+        }
+      }]
+    }
+    </script>
 </head>
 <body class="bg-gray-50 min-h-screen">
 <!-- Header -->
-<header class="bg-white shadow-sm">
-<div class="container mx-auto px-4 py-4 flex justify-between items-center">
-<a href="#" class="flex items-center space-x-2">
-<div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-<i class="ri-video-download-line text-white ri-lg"></i>
-</div>
-<span class="text-2xl font-['Pacifico'] text-gray-900">YTDownloader</span>
-</a>
-<nav class="hidden md:flex items-center space-x-8">
-<a href="#" class="text-gray-900 font-medium hover:text-primary transition-colors">Home</a>
-<a href="#" class="text-gray-600 hover:text-primary transition-colors">How to Use</a>
-<a href="#" class="text-gray-600 hover:text-primary transition-colors">Support</a>
-<a href="#" class="bg-primary text-white px-4 py-2 !rounded-button whitespace-nowrap font-medium hover:bg-opacity-90 transition-colors">Get Started</a>
-</nav>
-<button class="md:hidden w-10 h-10 flex items-center justify-center">
-<i class="ri-menu-line text-gray-900 ri-lg"></i>
-</button>
-</div>
+<header class="bg-white shadow-sm sticky top-0 z-40">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <a href="#home" class="flex items-center space-x-2">
+            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                <i class="ri-video-download-line text-white ri-lg"></i>
+            </div>
+            <span class="text-2xl font-['Pacifico'] text-gray-900">YTDownloader</span>
+        </a>
+        <nav class="hidden md:flex items-center space-x-8">
+            <a href="#home" class="nav-link text-gray-900 font-medium hover:text-primary transition-colors">Home</a>
+            <a href="#how-it-works" class="nav-link text-gray-600 hover:text-primary transition-colors">How to Use</a>
+            <a href="#features" class="nav-link text-gray-600 hover:text-primary transition-colors">Features</a>
+            <a href="#faq" class="nav-link text-gray-600 hover:text-primary transition-colors">FAQ</a>
+        </nav>
+        <a href="#home" class="hidden md:inline-block bg-primary text-white px-4 py-2 !rounded-button whitespace-nowrap font-medium hover:bg-opacity-90 transition-colors">Get Started</a>
+        <button id="mobile-menu-btn" class="md:hidden w-10 h-10 flex items-center justify-center">
+            <i class="ri-menu-line text-gray-900 ri-lg"></i>
+        </button>
+    </div>
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden">
+        <nav class="px-2 pt-2 pb-4 space-y-1 sm:px-3">
+            <a href="#home" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:text-primary hover:bg-gray-50">Home</a>
+            <a href="#how-it-works" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-primary hover:bg-gray-50">How to Use</a>
+            <a href="#features" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-primary hover:bg-gray-50">Features</a>
+            <a href="#faq" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-primary hover:bg-gray-50">FAQ</a>
+        </nav>
+    </div>
 </header>
-<!-- Hero Section -->
-<section class="bg-gradient-to-r from-gray-50 to-gray-100 py-16 md:py-24">
-<div class="container mx-auto px-4">
-<div class="max-w-3xl mx-auto text-center">
-<h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Download YouTube Videos with Ease</h1>
-<p class="text-xl text-gray-600 mb-8">Fast, free, and simple way to download videos from YouTube in your preferred format and quality.</p>
-<div class="bg-white p-6 rounded-xl shadow-lg">
-<div class="mb-4">
-<div class="input-with-icon">
-<i class="ri-link ri-lg"></i>
-<input
-type="text"
-id="video-url"
-class="w-full px-4 py-3 text-gray-900 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-placeholder="Paste YouTube video link here"
->
-</div>
-</div>
-<button id="download-btn" class="w-full bg-primary text-white py-3 font-medium !rounded-button whitespace-nowrap hover:bg-opacity-90 transition-colors">
-Download Now
-</button>
-</div>
-</div>
-</div>
-</section>
-<!-- Video Preview Section (Initially Hidden) -->
-<section id="video-preview" class="py-12 hidden">
-<div class="container mx-auto px-4">
-<div class="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-lg">
-<div class="flex flex-col md:flex-row gap-6">
-<div class="w-full md:w-2/5">
-<img
-id="video-thumbnail"
-src=""
-alt="Video Thumbnail"
-class="w-full h-auto rounded object-cover object-top"
->
-</div>
-<div class="w-full md:w-3/5">
-<h3 id="video-title" class="text-xl font-semibold text-gray-900 mb-2">Video Title</h3>
-<p id="video-channel" class="text-gray-600 mb-4">Channel Name</p>
-<div id="download-buttons-container" class="flex flex-wrap gap-2">
-<!-- Download buttons will be dynamically inserted here -->
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
 
-<!-- Notification Popups -->
-<div id="notification-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+<main>
+    <!-- Hero Section -->
+    <section id="home" class="bg-gradient-to-r from-gray-50 to-gray-100 py-16 md:py-24">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto text-center">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Free YouTube Video Downloader</h1>
+                <p class="text-xl text-gray-600 mb-8">Fast, free, and simple way to download videos from YouTube. Convert to MP4 or MP3 in your preferred quality.</p>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="mb-4">
+                        <div class="input-with-icon">
+                            <i class="ri-link ri-lg"></i>
+                            <input type="text" id="video-url" class="w-full px-4 py-3 text-gray-900 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Paste YouTube video link here">
+                        </div>
+                    </div>
+                    <button id="download-btn" class="w-full bg-primary text-white py-3 font-medium !rounded-button whitespace-nowrap hover:bg-opacity-90 transition-colors">Download Video</button>
+                </div>
+            </div>
+        </div>
+    </section>
 
-<!-- Features Section -->
-<section class="py-16 bg-white">
-<div class="container mx-auto px-4">
-<div class="text-center mb-12">
-<h2 class="text-3xl font-bold text-gray-900 mb-4">Why Choose Our YouTube Downloader</h2>
-<p class="text-xl text-gray-600 max-w-2xl mx-auto">Experience the best features designed to make your downloading experience seamless and efficient.</p>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-<div class="bg-gray-50 p-6 rounded-xl text-center">
-<div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
-<i class="ri-money-dollar-circle-line text-primary ri-2x"></i>
-</div>
-<h3 class="text-xl font-semibold text-gray-900 mb-2">100% Free</h3>
-<p class="text-gray-600">Download unlimited videos without any cost or hidden charges. No premium plans needed.</p>
-</div>
-<div class="bg-gray-50 p-6 rounded-xl text-center">
-<div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
-<i class="ri-user-unfollow-line text-primary ri-2x"></i>
-</div>
-<h3 class="text-xl font-semibold text-gray-900 mb-2">No Registration</h3>
-<p class="text-gray-600">No account creation required. Simply paste the URL and start downloading right away.</p>
-</div>
-<div class="bg-gray-50 p-6 rounded-xl text-center">
-<div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
-<i class="ri-file-list-3-line text-primary ri-2x"></i>
-</div>
-<h3 class="text-xl font-semibold text-gray-900 mb-2">Multiple Formats</h3>
-<p class="text-gray-600">Download videos in various formats including MP4, MP3, WebM, and more with different quality options.</p>
-</div>
-<div class="bg-gray-50 p-6 rounded-xl text-center">
-<div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
-<i class="ri-speed-up-line text-primary ri-2x"></i>
-</div>
-<h3 class="text-xl font-semibold text-gray-900 mb-2">High Speed</h3>
-<p class="text-gray-600">Enjoy fast downloads with our optimized servers that provide maximum speed and reliability.</p>
-</div>
-</div>
-</div>
-</section>
-<!-- How It Works Section -->
-<section class="py-16 bg-gray-50">
-<div class="container mx-auto px-4">
-<div class="text-center mb-12">
-<h2 class="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
-<p class="text-xl text-gray-600 max-w-2xl mx-auto">Download any YouTube video in just four simple steps.</p>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto">
-<div class="bg-white p-6 rounded-xl shadow-sm text-center relative">
-<div class="absolute -top-4 -left-4 w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">1</div>
-<h3 class="text-xl font-semibold text-gray-900 mb-2">Copy Video URL</h3>
-<p class="text-gray-600">Go to YouTube and copy the URL of the video you want to download.</p>
-</div>
-<div class="bg-white p-6 rounded-xl shadow-sm text-center relative">
-<div class="absolute -top-4 -left-4 w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">2</div>
-<h3 class="text-xl font-semibold text-gray-900 mb-2">Paste the Link</h3>
-<p class="text-gray-600">Paste the copied URL into the input field on our website.</p>
-</div>
-<div class="bg-white p-6 rounded-xl shadow-sm text-center relative">
-<div class="absolute -top-4 -left-4 w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">3</div>
-<h3 class="text-xl font-semibold text-gray-900 mb-2">Get Download Links</h3>
-<p class="text-gray-600">Our tool processes the link and provides all available formats.</p>
-</div>
-<div class="bg-white p-6 rounded-xl shadow-sm text-center relative">
-<div class="absolute -top-4 -left-4 w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">4</div>
-<h3 class="text-xl font-semibold text-gray-900 mb-2">Download</h3>
-<p class="text-gray-600">Click the desired format button to save the file to your device.</p>
-</div>
-</div>
-</div>
-</section>
-<!-- FAQ Section -->
-<section class="py-16 bg-white">
-<div class="container mx-auto px-4">
-<div class="text-center mb-12">
-<h2 class="text-3xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
-<p class="text-xl text-gray-600 max-w-2xl mx-auto">Find answers to common questions about our YouTube downloader.</p>
-</div>
-<div class="max-w-3xl mx-auto">
-<div class="mb-4">
-<button class="faq-toggle w-full text-left bg-gray-50 p-4 rounded-lg flex justify-between items-center">
-<span class="text-lg font-medium text-gray-900">Is this service completely free?</span>
-<i class="ri-arrow-down-s-line text-gray-600 ri-lg"></i>
-</button>
-<div class="faq-content hidden p-4 bg-gray-50 rounded-b-lg mt-1">
-<p class="text-gray-600">Yes, our YouTube downloader is 100% free to use. There are no hidden charges, subscription fees, or premium plans. You can download as many videos as you want without any cost.</p>
-</div>
-</div>
-<div class="mb-4">
-<button class="faq-toggle w-full text-left bg-gray-50 p-4 rounded-lg flex justify-between items-center">
-<span class="text-lg font-medium text-gray-900">Is it legal to download YouTube videos?</span>
-<i class="ri-arrow-down-s-line text-gray-600 ri-lg"></i>
-</button>
-<div class="faq-content hidden p-4 bg-gray-50 rounded-b-lg mt-1">
-<p class="text-gray-600">Downloading videos from YouTube for personal use is generally acceptable. However, redistributing or using copyrighted content commercially without permission may violate copyright laws. Always respect intellectual property rights and use downloaded content responsibly.</p>
-</div>
-</div>
-<div class="mb-4">
-<button class="faq-toggle w-full text-left bg-gray-50 p-4 rounded-lg flex justify-between items-center">
-<span class="text-lg font-medium text-gray-900">What formats are supported?</span>
-<i class="ri-arrow-down-s-line text-gray-600 ri-lg"></i>
-</button>
-<div class="faq-content hidden p-4 bg-gray-50 rounded-b-lg mt-1">
-<p class="text-gray-600">We support various formats including MP4, WebM, and MKV for video, and MP3, M4A, and OGG for audio. You can also choose different quality options ranging from 360p to 4K for videos, depending on the original video quality.</p>
-</div>
-</div>
-</div>
-</div>
-</section>
+    <!-- Video Preview Section (Initially Hidden) -->
+    <section id="video-preview" class="py-12 hidden">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-lg">
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="w-full md:w-2/5">
+                        <img id="video-thumbnail" src="" alt="Video Thumbnail Preview" class="w-full h-auto rounded object-cover object-top">
+                    </div>
+                    <div class="w-full md:w-3/5">
+                        <h2 id="video-title" class="text-xl font-semibold text-gray-900 mb-2">Video Title</h2>
+                        <p id="video-channel" class="text-gray-600 mb-4">Channel Name</p>
+                        <div id="download-buttons-container" class="flex flex-wrap gap-2">
+                            <!-- Download buttons will be dynamically inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Notification Popups -->
+    <div id="notification-container" class="fixed top-20 right-4 z-50 space-y-2"></div>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">The Best Online YouTube Downloader</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Experience the best features designed to make your video downloading experience seamless and efficient.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="bg-gray-50 p-6 rounded-xl text-center">
+                    <div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="ri-money-dollar-circle-line text-primary ri-2x"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">100% Free Downloads</h3>
+                    <p class="text-gray-600">Download unlimited YouTube videos without any cost or hidden charges. No premium plans needed.</p>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-xl text-center">
+                    <div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="ri-user-unfollow-line text-primary ri-2x"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">No Registration Required</h3>
+                    <p class="text-gray-600">No account creation required. Simply paste the URL and start your YouTube to MP4 or MP3 download right away.</p>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-xl text-center">
+                    <div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="ri-file-list-3-line text-primary ri-2x"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Multiple Formats Supported</h3>
+                    <p class="text-gray-600">Download videos in various formats including MP4, MP3, WebM, and more with different quality options like HD and 4K.</p>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-xl text-center">
+                    <div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="ri-speed-up-line text-primary ri-2x"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">High-Speed Conversion</h3>
+                    <p class="text-gray-600">Enjoy fast downloads with our optimized servers that provide maximum speed for your YouTube video conversions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">How to Download a YouTube Video</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Download any YouTube video in just four simple steps with our online tool.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto">
+                <div class="bg-white p-6 rounded-xl shadow-sm text-center relative">
+                    <div class="absolute -top-4 -left-4 w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">1</div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Copy Video URL</h3>
+                    <p class="text-gray-600">Go to YouTube and copy the URL of the video you want to download.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm text-center relative">
+                    <div class="absolute -top-4 -left-4 w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">2</div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Paste the Link</h3>
+                    <p class="text-gray-600">Paste the copied URL into the input field on our YouTube downloader.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm text-center relative">
+                    <div class="absolute -top-4 -left-4 w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">3</div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Choose Format</h3>
+                    <p class="text-gray-600">Select your preferred format (MP4, MP3) and quality (HD, 4K) from the available options.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm text-center relative">
+                    <div class="absolute -top-4 -left-4 w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">4</div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Download</h3>
+                    <p class="text-gray-600">Click the download button to save the video or audio file to your device.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Find answers to common questions about our YouTube video downloader.</p>
+            </div>
+            <div class="max-w-3xl mx-auto">
+                <div class="mb-4">
+                    <button class="faq-toggle w-full text-left bg-gray-50 p-4 rounded-lg flex justify-between items-center">
+                        <h3 class="text-lg font-medium text-gray-900">Is this YouTube downloader completely free?</h3>
+                        <i class="ri-arrow-down-s-line text-gray-600 ri-lg"></i>
+                    </button>
+                    <div class="faq-content hidden p-4 bg-gray-50 rounded-b-lg mt-1">
+                        <p class="text-gray-600">Yes, our YouTube downloader is 100% free to use. There are no hidden charges, subscription fees, or premium plans. You can download as many videos as you want without any cost.</p>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <button class="faq-toggle w-full text-left bg-gray-50 p-4 rounded-lg flex justify-between items-center">
+                        <h3 class="text-lg font-medium text-gray-900">Is it legal to download YouTube videos?</h3>
+                        <i class="ri-arrow-down-s-line text-gray-600 ri-lg"></i>
+                    </button>
+                    <div class="faq-content hidden p-4 bg-gray-50 rounded-b-lg mt-1">
+                        <p class="text-gray-600">Downloading videos from YouTube for personal use is generally acceptable. However, you should not use copyrighted content for commercial purposes without permission. We recommend only downloading non-copyrighted videos or videos you have permission to use.</p>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <button class="faq-toggle w-full text-left bg-gray-50 p-4 rounded-lg flex justify-between items-center">
+                        <h3 class="text-lg font-medium text-gray-900">What video and audio formats are supported?</h3>
+                        <i class="ri-arrow-down-s-line text-gray-600 ri-lg"></i>
+                    </button>
+                    <div class="faq-content hidden p-4 bg-gray-50 rounded-b-lg mt-1">
+                        <p class="text-gray-600">Our tool supports a wide range of formats, including MP4, WebM, and MKV for video, and MP3, M4A, and OGG for audio. You can also choose from various quality options, from 360p up to 4K, depending on the original video.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
 <!-- Footer -->
-<footer class="bg-gray-800 text-gray-300 py-12">
-<div class="container mx-auto px-4">
-<div class="border-t border-gray-700 mt-8 pt-8 text-center">
-<p>&copy; 2025 YTDownloader. All rights reserved.</p>
-</div>
-</div>
+<footer class="bg-gray-800 text-gray-300 pt-12">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Brand Info -->
+            <div>
+                <a href="#home" class="flex items-center space-x-2 mb-4">
+                    <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                        <i class="ri-video-download-line text-white ri-lg"></i>
+                    </div>
+                    <span class="text-2xl font-['Pacifico'] text-white">YTDownloader</span>
+                </a>
+                <p class="mb-4">The best free online tool to download and convert YouTube videos in high quality.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-primary transition-colors" aria-label="Facebook">
+                        <i class="ri-facebook-fill text-white"></i>
+                    </a>
+                    <a href="#" class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-primary transition-colors" aria-label="Twitter">
+                        <i class="ri-twitter-x-fill text-white"></i>
+                    </a>
+                    <a href="#" class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-primary transition-colors" aria-label="Instagram">
+                        <i class="ri-instagram-fill text-white"></i>
+                    </a>
+                </div>
+            </div>
+            <!-- Quick Links -->
+            <div>
+                <h3 class="text-lg font-semibold text-white mb-4">Quick Links</h3>
+                <ul class="space-y-2">
+                    <li><a href="#home" class="nav-link hover:text-primary transition-colors">Home</a></li>
+                    <li><a href="#features" class="nav-link hover:text-primary transition-colors">Features</a></li>
+                    <li><a href="#how-it-works" class="nav-link hover:text-primary transition-colors">How It Works</a></li>
+                    <li><a href="#faq" class="nav-link hover:text-primary transition-colors">FAQ</a></li>
+                </ul>
+            </div>
+            <!-- Legal -->
+            <div>
+                <h3 class="text-lg font-semibold text-white mb-4">Legal</h3>
+                <ul class="space-y-2">
+                    <li><a href="#" class="hover:text-primary transition-colors">Terms of Service</a></li>
+                    <li><a href="#" class="hover:text-primary transition-colors">Privacy Policy</a></li>
+                    <li><a href="#" class="hover:text-primary transition-colors">Copyright Policy</a></li>
+                </ul>
+            </div>
+            <!-- Contact -->
+            <div>
+                <h3 class="text-lg font-semibold text-white mb-4">Contact</h3>
+                <ul class="space-y-2">
+                    <li class="flex items-start space-x-2">
+                        <i class="ri-mail-line mt-1"></i>
+                        <span>support@ytdownloader.com</span>
+                    </li>
+                    <li class="flex items-start space-x-2">
+                        <i class="ri-map-pin-line mt-1"></i>
+                        <span>123 Tech Street, San Francisco, CA</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-gray-700 mt-8 py-8 text-center">
+            <p>&copy; 2025 YTDownloader. All rights reserved.</p>
+        </div>
+    </div>
 </footer>
+
+<script id="navigation-script">
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Smooth Scrolling for Nav Links ---
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            if(targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+    // --- Mobile Menu Toggle ---
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuBtn.addEventListener('click', function() {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    // --- Close mobile menu when a link is clicked ---
+    mobileMenu.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            mobileMenu.classList.add('hidden');
+        });
+    });
+});
+</script>
 
 <script id="api-script">
 document.addEventListener('DOMContentLoaded', function() {
@@ -366,7 +502,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showNotification(error.message, 'error');
             videoPreview.classList.add('hidden');
         } finally {
-            downloadBtn.innerHTML = 'Download Now';
+            downloadBtn.innerHTML = 'Download Video';
             downloadBtn.disabled = false;
         }
     });

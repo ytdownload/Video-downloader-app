@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>Privacy Policy - YTDownloader</title>
+    <meta name="description" content="Privacy Policy for the YTDownloader free online YouTube video downloader. We are committed to protecting your privacy and handling your data responsibly.">
+    <meta name="robots" content="index, follow">
+
+    <!-- Stylesheets and Fonts -->
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>tailwind.config={theme:{extend:{colors:{primary:'#FF0000',secondary:'#1F2937'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .prose h2 { font-size: 1.5rem; font-weight: 600; margin-top: 2em; margin-bottom: 1em; }
+        .prose h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.5em; margin-bottom: 0.75em; }
+        .prose p, .prose li { color: #4B5563; }
+        .prose a { color: #FF0000; text-decoration: underline; }
+        .prose a:hover { color: #D90000; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+<!-- Header -->
+<header class="bg-white shadow-sm sticky top-0 z-40">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <!-- Make sure to replace 'index.html' with the actual name of your main page file -->
+        <a href="index.html" class="flex items-center space-x-2">
+            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                <i class="ri-video-download-line text-white ri-lg"></i>
+            </div>
+            <span class="text-2xl font-['Pacifico'] text-gray-900">YTDownloader</span>
+        </a>
+        <nav>
+             <!-- Link back to the main page -->
+            <a href="index.html" class="text-gray-900 font-medium hover:text-primary transition-colors">Back to Downloader</a>
+        </nav>
+    </div>
+</header>
+
+<main class="py-12 md:py-16">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto bg-white p-8 md:p-12 rounded-xl shadow-lg">
+            <div class="prose max-w-none">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Privacy Policy for YTDownloader</h1>
+                <p class="text-gray-500">Last updated: July 8, 2025</p>
+
+                <p>Welcome to YTDownloader ("we," "our," or "us"). We are committed to protecting your privacy. This Privacy Policy explains how we handle information when you use our website and services (collectively, the "Service").</p>
+
+                <h2>1. Information We Collect</h2>
+                <p>Our goal is to collect as little information as possible to provide you with our Service. We do not require you to create an account or provide any personal information to use our downloader.</p>
+                
+                <h3>Information You Provide</h3>
+                <ul>
+                    <li><strong>YouTube Video URLs:</strong> The only information you actively provide is the URL of the YouTube video you wish to download. We do not store these URLs after your session is complete. The URL is processed in real-time to fetch download links and is then discarded.</li>
+                </ul>
+
+                <h3>Information Collected Automatically</h3>
+                <ul>
+                    <li><strong>Usage Data:</strong> Like most websites, our servers may automatically log standard data provided by your web browser. This may include your device's IP address, browser type and version, the pages you visit, the time and date of your visit, and other standard technical data. This information is used for analytical purposes to improve our Service and for security monitoring. It is not linked to your personal identity.</li>
+                    <li><strong>Cookies:</strong> We may use cookies to enhance your experience. Cookies are small files stored on your device. We may use them to understand site usage and improve the content and offerings on our site. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent.</li>
+                </ul>
+
+                <h2>2. How We Use Your Information</h2>
+                <p>We use the collected information for the following purposes:</p>
+                <ul>
+                    <li><strong>To Provide and Maintain our Service:</strong> The primary use of the YouTube URL you provide is to process your download request by communicating with the necessary third-party APIs.</li>
+                    <li><strong>To Improve and Analyze our Service:</strong> We use anonymous usage data to understand how our Service is being used, to identify issues, and to make improvements.</li>
+                    <li><strong>To Ensure Security:</strong> We monitor for malicious activity to protect our Service and our users.</li>
+                </ul>
+
+                <h2>3. Third-Party Services</h2>
+                <p>To provide download links, our Service communicates with a third-party API, the <strong>YouTube Media Downloader API</strong>, which is available on RapidAPI. When you submit a YouTube URL, it is sent to this API to retrieve the available download formats.</p>
+                <p>We are not responsible for the privacy practices of this third-party service. We encourage you to review their privacy policies to understand how they handle data. You can find more information on the RapidAPI website.</p>
+
+                <h2>4. Data Storage and Security</h2>
+                <p>We do not store the YouTube URLs you submit or any files you download on our servers. The conversion and download process is handled in real-time. We implement reasonable security measures to protect the integrity of our Service and the limited data we process, but no method of transmission over the Internet or electronic storage is 100% secure.</p>
+
+                <h2>5. Children's Privacy</h2>
+                <p>Our Service is not intended for use by children under the age of 13. We do not knowingly collect any personally identifiable information from children. If you believe that a child has provided us with information, please contact us immediately, and we will take steps to remove it.</p>
+
+                <h2>6. Changes to This Privacy Policy</h2>
+                <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date at the top. You are advised to review this Privacy Policy periodically for any changes.</p>
+
+                <h2>7. Contact Us</h2>
+                <p>If you have any questions about this Privacy Policy, please contact us at:</p>
+                <p><a href="mailto:support@ytdownloader.com">support@ytdownloader.com</a></p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="bg-gray-800 text-gray-300 pt-12">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Brand Info -->
+            <div>
+                <!-- Make sure to replace 'index.html' with the actual name of your main page file -->
+                <a href="index.html" class="flex items-center space-x-2 mb-4">
+                    <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                        <i class="ri-video-download-line text-white ri-lg"></i>
+                    </div>
+                    <span class="text-2xl font-['Pacifico'] text-white">YTDownloader</span>
+                </a>
+                <p class="mb-4">The best free online tool to download and convert YouTube videos in high quality.</p>
+            </div>
+            <!-- Quick Links -->
+            <div>
+                <h3 class="text-lg font-semibold text-white mb-4">Quick Links</h3>
+                <ul class="space-y-2">
+                    <li><a href="index.html#home" class="hover:text-primary transition-colors">Home</a></li>
+                    <li><a href="index.html#features" class="hover:text-primary transition-colors">Features</a></li>
+                    <li><a href="index.html#how-it-works" class="hover:text-primary transition-colors">How It Works</a></li>
+                    <li><a href="index.html#faq" class="hover:text-primary transition-colors">FAQ</a></li>
+                </ul>
+            </div>
+            <!-- Legal -->
+            <div>
+                <h3 class="text-lg font-semibold text-white mb-4">Legal</h3>
+                <ul class="space-y-2">
+                    <li><a href="#" class="hover:text-primary transition-colors">Terms of Service</a></li>
+                    <li><a href="privacy-policy.html" class="hover:text-primary transition-colors">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <!-- Contact -->
+            <div>
+                <h3 class="text-lg font-semibold text-white mb-4">Contact</h3>
+                <ul class="space-y-2">
+                    <li class="flex items-start space-x-2">
+                        <i class="ri-mail-line mt-1"></i>
+                        <span>support@ytdownloader.com</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-gray-700 mt-8 py-8 text-center">
+            <p>&copy; 2025 YTDownloader. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

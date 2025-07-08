@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>Copyright Policy - YTDownloader</title>
+    <meta name="description" content="Copyright Policy for the YTDownloader free online YouTube video downloader. We respect intellectual property rights and comply with the DMCA.">
+    <meta name="robots" content="index, follow">
+
+    <!-- Stylesheets and Fonts -->
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>tailwind.config={theme:{extend:{colors:{primary:'#FF0000',secondary:'#1F2937'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .prose h2 { font-size: 1.5rem; font-weight: 600; margin-top: 2em; margin-bottom: 1em; }
+        .prose h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.5em; margin-bottom: 0.75em; }
+        .prose p, .prose li { color: #4B5563; }
+        .prose a { color: #FF0000; text-decoration: underline; }
+        .prose a:hover { color: #D90000; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+<!-- Header -->
+<header class="bg-white shadow-sm sticky top-0 z-40">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <!-- Make sure to replace 'index.html' with the actual name of your main page file -->
+        <a href="index.html" class="flex items-center space-x-2">
+            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                <i class="ri-video-download-line text-white ri-lg"></i>
+            </div>
+            <span class="text-2xl font-['Pacifico'] text-gray-900">YTDownloader</span>
+        </a>
+        <nav>
+             <!-- Link back to the main page -->
+            <a href="index.html" class="text-gray-900 font-medium hover:text-primary transition-colors">Back to Downloader</a>
+        </nav>
+    </div>
+</header>
+
+<main class="py-12 md:py-16">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto bg-white p-8 md:p-12 rounded-xl shadow-lg">
+            <div class="prose max-w-none">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Copyright Policy</h1>
+                <p class="text-gray-500">Last updated: July 8, 2025</p>
+
+                <p>YTDownloader ("we," "our," or "us") respects the intellectual property rights of others and expects its users to do the same. It is our policy, in appropriate circumstances and at our discretion, to respond to notices of alleged copyright infringement that comply with the Digital Millennium Copyright Act of 1998 ("DMCA").</p>
+
+                <h2>1. The Role of Our Service</h2>
+                <p>Our service is a technical tool that allows users to download videos from YouTube. We do not host, store, or archive any video content on our servers. The service acts as a technical intermediary, fetching data from third-party APIs based on the URL provided by the user. The responsibility for using the service in a manner that respects copyright law lies entirely with the user.</p>
+
+                <h2>2. Policy on Copyright Infringement</h2>
+                <p>We do not permit or condone the downloading of copyrighted materials in violation of applicable laws. Our service should only be used to download videos that are in the public domain, licensed under Creative Commons, content for which you own the copyright, or videos for which you have obtained explicit permission from the copyright holder.</p>
+                <p>By using our service, you agree that you will not download content that infringes on any third-party copyrights. You are solely responsible and liable for any copyright infringement that may occur as a result of your use of the service.</p>
+
+                <h2>3. DMCA Notification of Infringement</h2>
+                <p>While we do not host any content, we take copyright concerns seriously. If you are a copyright owner or an agent thereof and believe that our service is being used to facilitate the infringement of your copyrighted work, please submit a DMCA takedown notice. However, please note that because we do not host any content, the most effective way to protect your rights is to submit a takedown notice directly to the platform hosting the content (e.g., YouTube).</p>
+                <p>If you still wish to notify us, your notice must include the following information:</p>
+                <ul>
+                    <li>A physical or electronic signature of a person authorized to act on behalf of the owner of an exclusive right that is allegedly infringed.</li>
+                    <li>Identification of the copyrighted work claimed to have been infringed, or, if multiple copyrighted works are covered by a single notification, a representative list of such works.</li>
+                    <li>The specific YouTube URL(s) of the material that is claimed to be infringing or to be the subject of infringing activity.</li>
+                    <li>Information reasonably sufficient to permit us to contact you, such as an address, telephone number, and, if available, an email address.</li>
+                    <li>A statement that you have a good faith belief that use of the material in the manner complained of is not authorized by the copyright owner, its agent, or the law.</li>
+                    <li>A statement that the information in the notification is accurate, and under penalty of perjury, that you are authorized to act on behalf of the owner of an exclusive right that is allegedly infringed.</li>
+                </ul>
+                <p>Please send your DMCA notice to our designated Copyright Agent at:</p>
+                <p><a href="mailto:copyright@ytdownloader.com">copyright@ytdownloader.com</a></p>
+                <p>Upon receipt of a compliant DMCA notice, we will investigate the claim. Please be aware that under the DMCA, claimants who make misrepresentations concerning copyright infringement may be liable for damages incurred as a result of the removal or blocking of the material, court costs, and attorneys' fees.</p>
+
+                <h2>4. User Responsibility</h2>
+                <p>We again emphasize that the user bears the ultimate responsibility for adhering to copyright laws. We provide the technical means to download content, but the legal right to do so must be respected by each individual user.</p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="bg-gray-800 text-gray-300 pt-12">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Brand Info -->
+            <div>
+                <!-- Make sure to replace 'index.html' with the actual name of your main page file -->
+                <a href="index.html" class="flex items-center space-x-2 mb-4">
+                    <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                        <i class="ri-video-download-line text-white ri-lg"></i>
+                    </div>
+                    <span class="text-2xl font-['Pacifico'] text-white">YTDownloader</span>
+                </a>
+                <p class="mb-4">The best free online tool to download and convert YouTube videos in high quality.</p>
+            </div>
+            <!-- Quick Links -->
+            <div>
+                <h3 class="text-lg font-semibold text-white mb-4">Quick Links</h3>
+                <ul class="space-y-2">
+                    <li><a href="index.html#home" class="hover:text-primary transition-colors">Home</a></li>
+                    <li><a href="index.html#features" class="hover:text-primary transition-colors">Features</a></li>
+                    <li><a href="index.html#how-it-works" class="hover:text-primary transition-colors">How It Works</a></li>
+                    <li><a href="index.html#faq" class="hover:text-primary transition-colors">FAQ</a></li>
+                </ul>
+            </div>
+            <!-- Legal -->
+            <div>
+                <h3 class="text-lg font-semibold text-white mb-4">Legal</h3>
+                <ul class="space-y-2">
+                    <li><a href="terms-of-service.html" class="hover:text-primary transition-colors">Terms of Service</a></li>
+                    <li><a href="privacy-policy.html" class="hover:text-primary transition-colors">Privacy Policy</a></li>
+                    <li><a href="copyright-policy.html" class="hover:text-primary transition-colors">Copyright Policy</a></li>
+                </ul>
+            </div>
+            <!-- Contact -->
+            <div>
+                <h3 class="text-lg font-semibold text-white mb-4">Contact</h3>
+                <ul class="space-y-2">
+                    <li class="flex items-start space-x-2">
+                        <i class="ri-mail-line mt-1"></i>
+                        <span>support@ytdownloader.com</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-gray-700 mt-8 py-8 text-center">
+            <p>&copy; 2025 YTDownloader. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>
